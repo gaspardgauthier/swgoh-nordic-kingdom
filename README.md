@@ -17,7 +17,7 @@ Single-page website presenting **Nordic Kingdom**, a 10-guild alliance in *Star 
 Open `index.html` in a browser.
 
 ## Deployment
-Hosted with GitHub Pages (Settings → Pages → Deploy from branch → `main` / root).
+https://ton-pseudo.github.io/swgoh-nordic-kingdom/
 
 ## Credits
 Crafted by Wali, Kinderkarten leader (Gaspard Gauthier). Guild histories written by their respective guild members.
