@@ -627,10 +627,80 @@
   .gp-recruiter { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; padding: 10px 16px; margin-bottom: 24px; background: rgba(255,255,255,0.05); border-left: 3px solid #2a8a3a; border-radius: 0 6px 6px 0; }
   .gp-recruiter-label { display: flex; align-items: center; gap: 6px; font-family: 'Orbitron', monospace; font-size: 0.66rem; letter-spacing: 0.2em; text-transform: uppercase; color: #fff; opacity: 0.85; white-space: nowrap; }
   .gp-recruiter-name { font-size: 0.95rem; font-weight: 600; color: #fff; letter-spacing: 0.05em; text-shadow: 0 0 8px #2a8a3a; }
+  .gp-author { font-family: 'Orbitron', monospace; font-size: 0.72rem; letter-spacing: 0.15em; text-transform: uppercase; color: #fff; border-left: 3px solid #2a8a3a; padding-left: 10px; margin-bottom: 20px; }
   .gp-history-label { font-family: 'Orbitron', monospace; font-size: 0.7rem; letter-spacing: 0.25em; text-transform: uppercase; color: #fff; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.15); }
   .gp-body p { color: rgba(255,255,255,0.88); font-size: 0.98rem; line-height: 1.78; margin-bottom: 14px; font-weight: 400; }
   .gp-body li { line-height: 1.5; }
   .gp-aurebesh { font-family: 'Aurebesh', serif !important; font-size: 1rem !important; opacity: 0.8; }
+
+  /* ── MEMBERS AREA (Kinderkarten) ── */
+  .btn--green { --btn: 42, 138, 58; background: rgba(var(--btn), 0.4); border-color: rgba(var(--btn), 0.85); }
+  .btn svg.btn-icon { width: 14px; height: 14px; }
+
+  .mb-lock { max-width: 440px; margin: 0 auto; }
+  .mb-form { display: flex; flex-direction: column; align-items: stretch; text-align: left; }
+  .mb-lock-icon { width: 40px; height: 40px; color: #7fdc8e; margin: 0 auto 14px; filter: drop-shadow(0 2px 10px rgba(42,138,58,0.6)); }
+  .mb-form-title {
+    font-family: 'Orbitron', monospace; font-size: 1rem; letter-spacing: 0.2em; text-transform: uppercase;
+    color: #fff; text-align: center; margin-bottom: 8px;
+  }
+  .gp-body .mb-form-hint { text-align: center; font-size: 0.92rem; color: rgba(255,255,255,0.75); margin-bottom: 22px; }
+  .mb-label {
+    display: block; font-family: 'Orbitron', monospace; font-size: 0.66rem; letter-spacing: 0.18em;
+    text-transform: uppercase; color: rgba(255,255,255,0.85); margin-bottom: 8px;
+  }
+  .mb-field { position: relative; margin-bottom: 14px; }
+  .mb-form input[type="password"], .mb-form input[type="text"] {
+    width: 100%; padding: 12px 46px 12px 14px; font: 400 1rem 'Exo 2', sans-serif; color: #fff;
+    background: rgba(2,4,15,0.6); border: 1px solid rgba(255,255,255,0.25); border-radius: 6px;
+    caret-color: var(--accent);
+    transition: border-color 160ms ease, box-shadow 160ms ease;
+  }
+  .mb-form input:focus-visible {
+    outline: none; border-color: #4fc463; box-shadow: 0 0 0 3px rgba(42,138,58,0.35);
+  }
+  .mb-form.is-invalid input[type="password"], .mb-form.is-invalid input[type="text"] { border-color: #ff6b6b; }
+  .mb-reveal {
+    position: absolute; right: 6px; top: 50%; translate: 0 -50%; width: 34px; height: 34px;
+    display: grid; place-items: center; background: none; border: 0; border-radius: 4px;
+    color: rgba(255,255,255,0.6); cursor: pointer; transition: color 160ms ease;
+  }
+  .mb-reveal svg { width: 18px; height: 18px; }
+  .mb-reveal[aria-pressed="true"] { color: #7fdc8e; }
+  @media (hover: hover) and (pointer: fine) { .mb-reveal:hover { color: #fff; } }
+  .mb-remember { display: flex; align-items: center; gap: 10px; font-size: 0.9rem; color: rgba(255,255,255,0.8); margin-bottom: 20px; cursor: pointer; }
+  .mb-remember input { width: 16px; height: 16px; accent-color: #2a8a3a; }
+  .mb-submit { width: 100%; padding: 13px 22px; }
+  .mb-submit[aria-busy="true"] { cursor: progress; opacity: 0.8; }
+  .gp-body .mb-error { min-height: 1.5em; margin: 12px 0 0; font-size: 0.9rem; color: #ff8a8a; text-align: center; }
+
+  /* Wrong password: a short, damped shake (feedback), then still */
+  @keyframes mb-shake {
+    0%, 100% { transform: translateX(0); }
+    20% { transform: translateX(-7px); }
+    45% { transform: translateX(6px); }
+    70% { transform: translateX(-3px); }
+  }
+  .mb-form.is-shaking .mb-field { animation: mb-shake 320ms var(--ease-out); }
+
+  .mb-welcome { text-align: center; }
+  .mb-welcome .mb-submit { margin-top: 6px; }
+  .mb-forget {
+    display: inline-block; margin-top: 14px; padding: 6px 8px; background: none; border: 0; cursor: pointer;
+    font: 500 0.88rem 'Exo 2', sans-serif; color: rgba(255,255,255,0.7); text-decoration: underline; text-underline-offset: 3px;
+  }
+  @media (hover: hover) and (pointer: fine) { .mb-forget:hover { color: #fff; } }
+
+  /* Hyperspace jump into the War Room */
+  .warp { position: fixed; inset: 0; z-index: 10000; pointer-events: none; background: transparent; }
+  .warp canvas { width: 100%; height: 100%; display: block; }
+  .warp::after { content: ''; position: absolute; inset: 0; background: #eaf8ff; opacity: 0; transition: opacity 180ms var(--ease-out); }
+  .warp.is-flash::after { opacity: 1; }
+  .warp.is-fade { background: #03050b; transition: background-color 220ms ease-out; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .mb-form.is-shaking .mb-field { animation: none; }
+  }
 
   /* ── VIEW TRANSITIONS: entering a guild ──
      The focal moment. Hovering a card already shows the guild's world behind the home;
@@ -939,6 +1009,10 @@
       <div class="gp-actions">
         <a href="https://www.youtube.com/channel/UC9GekaZrZrOOpLCymhJFV7Q" target="_blank" rel="noopener" class="btn btn--red">▶ Follow us on YouTube</a>
         <a href="https://swgoh.gg/g/Tr80nBuNRheBQJ4Wr3JBkQ/" target="_blank" rel="noopener" class="btn btn--orange">✦ Check our SWGOH.GG</a>
+        <a href="#/kinderkarten-members" class="btn btn--green">
+          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7.5a4 4 0 0 1 8 0V11"/></svg>
+          Members area
+        </a>
       </div>
     </div>
     <div class="gp-body" style="background:linear-gradient(to right,rgba(2,4,15,0.35) 0%,rgba(2,4,15,0.78) 30%,rgba(2,4,15,0.85) 50%,rgba(2,4,15,0.78) 70%,rgba(2,4,15,0.35) 100%);">
@@ -1034,6 +1108,58 @@
 </div>
 
 
+<div id="page-kinderkarten-members" class="guild-page members-page" role="dialog" aria-modal="true" aria-labelledby="title-kinderkarten-members" data-parent="kinderkarten" data-title="Members area — Kinderkarten" style="--bg:url(images/bg-kinderkarten.jpg);--accent:#2a8a3a">
+  <div class="gp-progress" aria-hidden="true"></div>
+  <div class="gp-backdrop" aria-hidden="true"></div>
+  <div class="gp-inner">
+    <button class="gp-back" type="button" onclick="closeGuildPage()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="white" aria-hidden="true"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+      Kinderkarten <kbd>Esc</kbd>
+    </button>
+    <div class="gp-header">
+      <p class="gp-label">Nordic Kingdom Kinderkarten</p>
+      <h1 class="gp-h1" id="title-kinderkarten-members">Members area</h1>
+      <p class="gp-devise">The War Room: TB plan, platoons and guides</p>
+      <div class="gp-divider">
+        <div class="gp-divider-line"></div>
+        <div class="gp-icon-wrap">
+          <div class="gp-icon-halo"></div>
+          <img class="gp-icon-img" src="images/icon-kinderkarten.svg" alt="">
+        </div>
+        <div class="gp-divider-line r"></div>
+      </div>
+    </div>
+
+    <!-- Locked state -->
+    <div class="gp-body mb-lock" data-mb="lock">
+      <form class="mb-form" data-mb="form" novalidate>
+        <svg class="mb-lock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="10.5" width="16" height="10.5" rx="2"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/><circle cx="12" cy="15.5" r="1.4"/></svg>
+        <h2 class="mb-form-title">Members only</h2>
+        <p class="mb-form-hint">Enter the password shared with Kinderkarten members</p>
+        <label class="mb-label" for="mb-password">Password</label>
+        <div class="mb-field">
+          <input id="mb-password" name="password" type="password" autocomplete="current-password" required data-autofocus>
+          <button type="button" class="mb-reveal" data-mb="reveal" aria-label="Show password" aria-pressed="false">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+        <label class="mb-remember"><input type="checkbox" data-mb="remember"> Remember me on this device</label>
+        <button type="submit" class="btn btn--green mb-submit" data-mb="submit">Unlock</button>
+        <p class="mb-error" data-mb="error" role="alert"></p>
+      </form>
+    </div>
+
+    <!-- Remembered on this device -->
+    <div class="gp-body mb-lock mb-welcome" data-mb="welcome" hidden>
+      <svg class="mb-lock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="10.5" width="16" height="10.5" rx="2"/><path d="M8 10.5V7.5a4 4 0 0 1 7.6-1.8"/><circle cx="12" cy="15.5" r="1.4"/></svg>
+      <h2 class="mb-form-title">Welcome back</h2>
+      <p class="mb-form-hint">This device remembers the password.</p>
+      <button type="button" class="btn btn--green mb-submit" data-mb="enter" data-autofocus>Enter the War Room</button>
+      <button type="button" class="mb-forget" data-mb="forget">Forget this device</button>
+    </div>
+  </div>
+</div>
+</div>
 <div id="page-nordic-kingdom" class="guild-page" role="dialog" aria-modal="true" aria-labelledby="title-nordic-kingdom" style="--bg:url(images/bg-nordic-kingdom.jpg);--accent:#e03030">
   <div class="gp-progress" aria-hidden="true"></div>
   <div class="gp-backdrop" aria-hidden="true"></div>
@@ -1757,7 +1883,6 @@ const router = (function() {
   document.querySelectorAll('.guild-page').forEach(p => pages.set(p.id.replace(/^page-/, ''), p));
   const baseTitle = document.title;
   let current = null;
-  let openedInApp = false;
   let instantNext = false;
   let activeTransition = null;
 
@@ -1788,9 +1913,14 @@ const router = (function() {
     wrapper.inert = true;
     scrollBtn.inert = true;
     const card = cardOf(id);
-    const full = card ? card.querySelector('h2').textContent.trim() : id;
-    const short = full.replace(/^Nordic Kingdom\s+/, '');
-    document.title = short === full ? baseTitle : short + ' — Nordic Kingdom';
+    if (page.dataset.title) {
+      document.title = page.dataset.title + ' — Nordic Kingdom';
+    } else {
+      const full = card ? card.querySelector('h2').textContent.trim() : id;
+      const short = full.replace(/^Nordic Kingdom\s+/, '');
+      document.title = short === full ? baseTitle : short + ' — Nordic Kingdom';
+    }
+    page.dispatchEvent(new CustomEvent('guildpage:show'));
     preview.clear();
     starfield.stop();
     clearTimeout(page._enterTimer);
@@ -1811,7 +1941,11 @@ const router = (function() {
 
   function focusAfter(prev, next) {
     if (next) {
-      pages.get(next).querySelector('.gp-back')?.focus({ preventScroll: true });
+      const page = pages.get(next);
+      const target = (prev && page.querySelector(`a[href="#/${prev}"]`))
+        || [...page.querySelectorAll('[data-autofocus]')].find(el => el.offsetParent !== null)
+        || page.querySelector('.gp-back');
+      target?.focus({ preventScroll: true });
     } else if (prev) {
       cardOf(prev)?.querySelector('.gc-link')?.focus({ preventScroll: true });
     }
@@ -1911,21 +2045,36 @@ const router = (function() {
 
   function close(instant = false) {
     if (!current) return;
+    const page = pages.get(current);
+    if (page._canClose && !page._canClose()) return;
     instantNext = instant;
-    if (openedInApp) {
-      history.back(); // Back button == browser back, history stays clean
+    if (history.state && history.state.nk) {
+      history.back(); // came here inside the site: Back button == browser back
+    } else if (page.dataset.parent) {
+      history.replaceState(null, '', '#/' + page.dataset.parent);
+      sync();
     } else {
       history.pushState(null, '', location.pathname + location.search);
       sync();
     }
   }
 
-  window.addEventListener('hashchange', () => {
-    if (routeId() && !current) openedInApp = true;
+  // Internal routes (#/guild) are recorded in history, so "Back" knows it can step back
+  document.addEventListener('click', e => {
+    const link = e.target.closest('a[href^="#/"]');
+    if (!link || e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    e.preventDefault();
+    if (link.getAttribute('href') === location.hash) return;
+    history.pushState({ nk: true }, '', link.getAttribute('href'));
     sync();
   });
-  window.addEventListener('popstate', () => { if (!routeId() && current) sync(); });
-  document.addEventListener('keydown', e => { if (e.key === 'Escape' && current) close(true); });
+  window.addEventListener('hashchange', sync);   // URL typed or edited by hand
+  window.addEventListener('popstate', sync);     // browser Back / Forward
+  document.addEventListener('keydown', e => {
+    if (e.key !== 'Escape' || !current) return;
+    if (e.target.closest('input, textarea, select')) return; // Esc in a form field is not "leave the page"
+    close(true);
+  });
 
   // Deep link (e.g. shared URL …/#/kinderkarten): open without animation
   instantNext = true;
@@ -1983,6 +2132,195 @@ document.querySelectorAll('nav.guild-nav a').forEach(link => {
     });
   });
   document.querySelector('main').addEventListener('pointerleave', () => preview.schedule(null, 220));
+})();
+
+/* ── KINDERKARTEN MEMBERS AREA: password gate ──
+   The War Room content lives encrypted in kinderkarten-members.data.js (AES-256-GCM, key derived
+   from the password with PBKDF2-SHA-256). The password is checked by decrypting it here, in the
+   browser; on success the derived key is handed to kinderkarten-members.html via sessionStorage. */
+(function() {
+  const page = document.getElementById('page-kinderkarten-members');
+  if (!page) return;
+
+  const DATA_SRC = 'kinderkarten-members.data.js';
+  const WAR_ROOM = 'kinderkarten-members.html';
+  const STORE = 'nk-kk-members-key';
+  const WARP_FLAG = 'nk-kk-warp';
+  const ITERATIONS = 600000;
+  const $ = name => page.querySelector(`[data-mb="${name}"]`);
+  const el = {
+    lock: $('lock'), form: $('form'), password: page.querySelector('#mb-password'), reveal: $('reveal'),
+    remember: $('remember'), submit: $('submit'), error: $('error'),
+    welcome: $('welcome'), enter: $('enter'), forget: $('forget'),
+  };
+
+  const toB64 = bytes => {
+    let s = '';
+    const b = new Uint8Array(bytes);
+    for (let i = 0; i < b.length; i += 0x8000) s += String.fromCharCode.apply(null, b.subarray(i, i + 0x8000));
+    return btoa(s);
+  };
+  const fromB64 = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
+  let loading = null;
+  const loadData = () => loading || (loading = new Promise((resolve, reject) => {
+    const s = document.createElement('script');
+    s.src = DATA_SRC;
+    s.onload = resolve;
+    s.onerror = () => { loading = null; reject(new Error('load')); };
+    document.head.appendChild(s);
+  }));
+  const data = () => window.NK_KK_MEMBERS;
+  const storage = () => { try { return { s: sessionStorage, l: localStorage }; } catch (e) { return null; } };
+
+  async function deriveKey(password, salt, iterations) {
+    const base = await crypto.subtle.importKey('raw', new TextEncoder().encode(password.normalize('NFC')), 'PBKDF2', false, ['deriveKey']);
+    return crypto.subtle.deriveKey({ name: 'PBKDF2', hash: 'SHA-256', salt, iterations }, base, { name: 'AES-GCM', length: 256 }, true, ['encrypt', 'decrypt']);
+  }
+  async function decryptWith(k) {
+    const d = data();
+    await crypto.subtle.decrypt({ name: 'AES-GCM', iv: fromB64(d.iv) }, k, fromB64(d.ct));
+  }
+  async function rememberKey(k, persist) {
+    const st = storage();
+    if (!st) return;
+    const value = JSON.stringify({ salt: data().salt, key: toB64(await crypto.subtle.exportKey('raw', k)) });
+    st.s.setItem(STORE, value);
+    if (persist) st.l.setItem(STORE, value); else st.l.removeItem(STORE);
+  }
+  function forgetKey() { const st = storage(); if (st) { st.s.removeItem(STORE); st.l.removeItem(STORE); } }
+  async function storedKey() {
+    const st = storage();
+    if (!st) return null;
+    const value = st.s.getItem(STORE) || st.l.getItem(STORE);
+    if (!value) return null;
+    try {
+      const { salt, key } = JSON.parse(value);
+      if (salt !== data().salt) { forgetKey(); return null; } // the password changed since
+      const k = await crypto.subtle.importKey('raw', fromB64(key), { name: 'AES-GCM' }, true, ['encrypt', 'decrypt']);
+      await decryptWith(k);
+      return k;
+    } catch (e) { forgetKey(); return null; }
+  }
+
+  function setError(msg) { el.error.textContent = msg; el.form.classList.toggle('is-invalid', !!msg); }
+  function busy(on) {
+    el.submit.disabled = on;
+    el.submit.setAttribute('aria-busy', on ? 'true' : 'false');
+    el.submit.textContent = on ? 'Unlocking…' : 'Unlock';
+  }
+  function shake() { el.form.classList.remove('is-shaking'); void el.form.offsetWidth; el.form.classList.add('is-shaking'); }
+  function showState(remembered) {
+    el.lock.hidden = remembered;
+    el.welcome.hidden = !remembered;
+  }
+
+  async function prepare() {
+    if (!window.isSecureContext || !window.crypto || !crypto.subtle) {
+      setError('This page must be opened over HTTPS to unlock.');
+      el.submit.disabled = true;
+      return false;
+    }
+    try { await loadData(); } catch (e) { setError('The members file could not be loaded. Check your connection and try again.'); return false; }
+    return !!data();
+  }
+
+  /* Hyperspace jump: stars stretch into streaks, flash, then the War Room loads */
+  function jump() {
+    try { sessionStorage.setItem(WARP_FLAG, '1'); } catch (e) {}
+    const go = () => { location.href = WAR_ROOM; };
+    const layer = document.createElement('div');
+    layer.className = 'warp';
+    layer.setAttribute('aria-hidden', 'true');
+    document.body.appendChild(layer);
+    if (reduceMotion.matches) {
+      requestAnimationFrame(() => layer.classList.add('is-fade'));
+      setTimeout(go, 240);
+      return;
+    }
+    const cv = document.createElement('canvas');
+    layer.appendChild(cv);
+    const dpr = Math.min(devicePixelRatio || 1, 2);
+    const w = cv.width = innerWidth * dpr, h = cv.height = innerHeight * dpr;
+    const ctx = cv.getContext('2d');
+    const cx = w / 2, cy = h / 2;
+    const N = 420;
+    const stars = Array.from({ length: N }, () => ({ a: Math.random() * Math.PI * 2, r: Math.random() * Math.max(w, h) * 0.6 + 8, s: 0.6 + Math.random() * 0.8 }));
+    const t0 = performance.now(), DUR = 780;
+    const frame = now => {
+      const k = Math.min(1, (now - t0) / DUR);
+      const speed = Math.pow(k, 2.4);                       // the jump gathers pace
+      ctx.fillStyle = `rgba(3,5,11,${0.25 + k * 0.5})`;
+      ctx.fillRect(0, 0, w, h);
+      ctx.lineCap = 'round';
+      for (const st of stars) {
+        const r0 = st.r * (1 + speed * 2.2 * st.s);
+        const r1 = r0 + (6 + speed * 900 * st.s) * dpr;
+        ctx.strokeStyle = `rgba(${190 + 60 * k | 0},${230 + 25 * k | 0},255,${0.35 + 0.6 * k})`;
+        ctx.lineWidth = (0.8 + speed * 1.8) * dpr;
+        ctx.beginPath();
+        ctx.moveTo(cx + Math.cos(st.a) * r0, cy + Math.sin(st.a) * r0);
+        ctx.lineTo(cx + Math.cos(st.a) * r1, cy + Math.sin(st.a) * r1);
+        ctx.stroke();
+      }
+      if (k < 1) requestAnimationFrame(frame);
+      else { layer.classList.add('is-flash'); setTimeout(go, 170); }
+    };
+    requestAnimationFrame(frame);
+  }
+  // Coming back with the browser's Back button restores this page from cache: clear the jump
+  window.addEventListener('pageshow', e => {
+    if (!e.persisted) return;
+    document.querySelectorAll('.warp').forEach(n => n.remove());
+    busy(false);
+    el.enter.disabled = false;
+  });
+
+  page.addEventListener('guildpage:show', async () => {
+    if (!(await prepare())) return;
+    showState(!!(await storedKey()));
+  });
+
+  el.form.addEventListener('submit', async e => {
+    e.preventDefault();
+    const password = el.password.value;
+    if (!password) { setError('Enter the password.'); shake(); el.password.focus(); return; }
+    if (!(await prepare())) return;
+    busy(true);
+    setError('');
+    try {
+      const d = data();
+      const k = await deriveKey(password, fromB64(d.salt), d.iter || ITERATIONS);
+      await decryptWith(k);
+      await rememberKey(k, el.remember.checked);
+      el.submit.textContent = 'Access granted';
+      jump();
+    } catch (err) {
+      busy(false);
+      setError('Wrong password. Try again.');
+      shake();
+      el.password.select();
+    }
+  });
+
+  el.enter.addEventListener('click', async () => {
+    el.enter.disabled = true;
+    const k = await storedKey();
+    if (!k) { el.enter.disabled = false; showState(false); el.password.focus(); return; }
+    await rememberKey(k, !!storage()?.l.getItem(STORE));
+    jump();
+  });
+  el.forget.addEventListener('click', () => { forgetKey(); showState(false); el.password.value = ''; el.password.focus(); });
+
+  el.reveal.addEventListener('click', () => {
+    const show = el.password.type === 'password';
+    el.password.type = show ? 'text' : 'password';
+    el.reveal.setAttribute('aria-pressed', String(show));
+    el.reveal.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+    el.password.focus();
+  });
+
+  // Opened by a deep link before this module was ready
+  if (page.classList.contains('active')) page.dispatchEvent(new CustomEvent('guildpage:show'));
 })();
 
 /* ── SCROLL TO TOP ── */

@@ -12,6 +12,17 @@ Single-page website presenting **Nordic Kingdom**, a 10-guild alliance in *Star 
 - Dynamic tenure calculation in JavaScript
 - Links to SWGOH.GG, YouTube and Discord
 
+## Kinderkarten members area (War Room)
+A password-protected space for Kinderkarten members: TB plan, platoon assignments and guild guides.
+
+- **Entry:** "Members area" button on the Kinderkarten page → password screen (`index.html#/kinderkarten-members`) → hyperspace jump → `kinderkarten-members.html`, the War Room: its own design, a Three.js holotable whose sectors light up with the TB phase being read, a kyber-crystal field for the platoons, and a player/unit search.
+- **Encryption:** the content is stored only encrypted in `kinderkarten-members.data.js` (AES-256-GCM, key derived from the password with PBKDF2-SHA-256, 600,000 iterations) and decrypted in the browser. No server is involved, so it works the same on GitHub Pages, Netlify or any HTTPS host. The page design itself is public; only the content is secret.
+- **Update the content or change the password:** in the War Room, click **Edit**, change the Markdown (the page previews live), optionally set a new password, click **Download encrypted file**, then replace `kinderkarten-members.data.js` in the site (GitHub and Netlify). Never commit the plain text.
+- **Content format (Markdown):** `# Title`, then `> By … · Objective: 41+`; `## TB plan` with one `### Phase` per phase whose first line is the **bold targets** separated by `~` (e.g. `**LS3 3⭐️ ~ MX3 3⭐️ ~ DS3 preload**`); `## Platoons` as a numbered list `1. **Player** — R8 Unit, R9 Unit`; any other `##` section (e.g. Guides) is shown as text.
+- Use a long password: the encrypted file is public, so a short password could be guessed offline.
+- "Remember me on this device" keeps the derived key in the browser; **Lock** forgets it.
+- Bundled libraries in `vendor/`: [marked](https://github.com/markedjs/marked) v12.0.2 and [three.js](https://threejs.org) r147 (both MIT).
+
 ## Tech
 - Plain HTML, CSS and JavaScript — no build step, no dependencies
 - `index.html` — page structure, styles, scripts and guild histories
