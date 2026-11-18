@@ -12,6 +12,15 @@ Single-page website presenting **Nordic Kingdom**, a 10-guild alliance in *Star 
 - Dynamic tenure calculation in JavaScript
 - Links to SWGOH.GG, YouTube and Discord
 
+## Kinderkarten members area
+A password-protected page (`#/kinderkarten-members`, button on the Kinderkarten page) for platoons, the TB plan and guild guides.
+
+- The content is stored **encrypted** in `kinderkarten-members.data.js` (AES-256-GCM, key derived from the password with PBKDF2-SHA-256, 600,000 iterations). It is decrypted in the visitor's browser; no server is involved, so it works the same on GitHub Pages, Netlify or any HTTPS host.
+- **To update the content or change the password:** open the members area, unlock it, click **Edit**, change the Markdown (and optionally set a new password), click **Download encrypted file**, then replace `kinderkarten-members.data.js` in the site (GitHub and Netlify). Never commit the plain text.
+- Use a long password (4–5 random words): the encrypted file is public, so a short password could be guessed offline.
+- "Remember me on this device" keeps the derived key in the browser's local storage; **Lock** forgets it.
+- Markdown is rendered with [marked](https://github.com/markedjs/marked) v12.0.2 (MIT), bundled in `vendor/`.
+
 ## Tech
 - Plain HTML, CSS and JavaScript — no build step, no dependencies
 - `index.html` — page structure, styles, scripts and guild histories

@@ -627,10 +627,155 @@
   .gp-recruiter { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; padding: 10px 16px; margin-bottom: 24px; background: rgba(255,255,255,0.05); border-left: 3px solid #2a8a3a; border-radius: 0 6px 6px 0; }
   .gp-recruiter-label { display: flex; align-items: center; gap: 6px; font-family: 'Orbitron', monospace; font-size: 0.66rem; letter-spacing: 0.2em; text-transform: uppercase; color: #fff; opacity: 0.85; white-space: nowrap; }
   .gp-recruiter-name { font-size: 0.95rem; font-weight: 600; color: #fff; letter-spacing: 0.05em; text-shadow: 0 0 8px #2a8a3a; }
+  .gp-author { font-family: 'Orbitron', monospace; font-size: 0.72rem; letter-spacing: 0.15em; text-transform: uppercase; color: #fff; border-left: 3px solid #2a8a3a; padding-left: 10px; margin-bottom: 20px; }
   .gp-history-label { font-family: 'Orbitron', monospace; font-size: 0.7rem; letter-spacing: 0.25em; text-transform: uppercase; color: #fff; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.15); }
   .gp-body p { color: rgba(255,255,255,0.88); font-size: 0.98rem; line-height: 1.78; margin-bottom: 14px; font-weight: 400; }
   .gp-body li { line-height: 1.5; }
   .gp-aurebesh { font-family: 'Aurebesh', serif !important; font-size: 1rem !important; opacity: 0.8; }
+
+  /* ── MEMBERS AREA (Kinderkarten) ── */
+  .btn--green { --btn: 42, 138, 58; background: rgba(var(--btn), 0.4); border-color: rgba(var(--btn), 0.85); }
+  .btn svg.btn-icon { width: 14px; height: 14px; }
+
+  .mb-lock { max-width: 440px; margin: 0 auto; }
+  .mb-form { display: flex; flex-direction: column; align-items: stretch; text-align: left; }
+  .mb-lock-icon { width: 40px; height: 40px; color: #7fdc8e; margin: 0 auto 14px; filter: drop-shadow(0 2px 10px rgba(42,138,58,0.6)); }
+  .mb-form-title {
+    font-family: 'Orbitron', monospace; font-size: 1rem; letter-spacing: 0.2em; text-transform: uppercase;
+    color: #fff; text-align: center; margin-bottom: 8px;
+  }
+  .gp-body .mb-form-hint { text-align: center; font-size: 0.92rem; color: rgba(255,255,255,0.75); margin-bottom: 22px; }
+  .mb-label {
+    display: block; font-family: 'Orbitron', monospace; font-size: 0.66rem; letter-spacing: 0.18em;
+    text-transform: uppercase; color: rgba(255,255,255,0.85); margin-bottom: 8px;
+  }
+  .mb-field { position: relative; margin-bottom: 14px; }
+  .mb-form input[type="password"], .mb-form input[type="text"], .mb-newpass input {
+    width: 100%; padding: 12px 46px 12px 14px; font: 400 1rem 'Exo 2', sans-serif; color: #fff;
+    background: rgba(2,4,15,0.6); border: 1px solid rgba(255,255,255,0.25); border-radius: 6px;
+    caret-color: var(--accent);
+    transition: border-color 160ms ease, box-shadow 160ms ease;
+  }
+  .mb-newpass input { padding-right: 14px; margin-bottom: 14px; }
+  .mb-form input:focus-visible, .mb-newpass input:focus-visible, .mb-editor textarea:focus-visible {
+    outline: none; border-color: #4fc463; box-shadow: 0 0 0 3px rgba(42,138,58,0.35);
+  }
+  .mb-form.is-invalid input[type="password"], .mb-form.is-invalid input[type="text"] { border-color: #ff6b6b; }
+  .mb-reveal {
+    position: absolute; right: 6px; top: 50%; translate: 0 -50%; width: 34px; height: 34px;
+    display: grid; place-items: center; background: none; border: 0; border-radius: 4px;
+    color: rgba(255,255,255,0.6); cursor: pointer; transition: color 160ms ease;
+  }
+  .mb-reveal svg { width: 18px; height: 18px; }
+  .mb-reveal[aria-pressed="true"] { color: #7fdc8e; }
+  @media (hover: hover) and (pointer: fine) { .mb-reveal:hover { color: #fff; } }
+  .mb-remember { display: flex; align-items: center; gap: 10px; font-size: 0.9rem; color: rgba(255,255,255,0.8); margin-bottom: 20px; cursor: pointer; }
+  .mb-remember input { width: 16px; height: 16px; accent-color: #2a8a3a; }
+  .mb-submit { width: 100%; padding: 13px 22px; }
+  .mb-submit[aria-busy="true"] { cursor: progress; opacity: 0.8; }
+  .gp-body .mb-error { min-height: 1.5em; margin: 12px 0 0; font-size: 0.9rem; color: #ff8a8a; text-align: center; }
+
+  /* Wrong password: a short, damped shake (feedback), then still */
+  @keyframes mb-shake {
+    0%, 100% { transform: translateX(0); }
+    20% { transform: translateX(-7px); }
+    45% { transform: translateX(6px); }
+    70% { transform: translateX(-3px); }
+  }
+  .mb-form.is-shaking .mb-field { animation: mb-shake 320ms var(--ease-out); }
+
+  /* Unlocked */
+  .mb-unlocked.is-revealed .mb-bar { animation: fade-in 320ms var(--ease-out) backwards; }
+  .mb-unlocked.is-revealed .mb-content { animation: rise-sm 420ms var(--ease-out) 60ms backwards; }
+  .mb-bar {
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px;
+    margin-bottom: 18px;
+  }
+  .mb-toc { display: flex; flex-wrap: wrap; gap: 8px; }
+  .mb-toc a, .mb-tool {
+    display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px;
+    font-family: 'Orbitron', monospace; font-size: 0.66rem; letter-spacing: 0.14em; text-transform: uppercase;
+    color: #fff; text-decoration: none; background: rgba(2,4,15,0.55); border: 1px solid rgba(255,255,255,0.28);
+    border-radius: 3px; cursor: pointer; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+    transition: border-color 200ms ease, background-color 200ms ease;
+  }
+  .mb-toc a::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: #4fc463; box-shadow: 0 0 6px #4fc463; }
+  .mb-tool svg { width: 14px; height: 14px; }
+  .mb-tools { display: flex; gap: 8px; }
+  @media (hover: hover) and (pointer: fine) {
+    .mb-toc a:hover, .mb-tool:hover { border-color: #4fc463; background: rgba(2,4,15,0.75); }
+  }
+
+  /* Rendered Markdown */
+  .mb-md > :first-child { margin-top: 0; }
+  .mb-md h2 {
+    font-family: 'Orbitron', monospace; font-size: 0.95rem; letter-spacing: 0.22em; text-transform: uppercase;
+    color: #fff; margin: 40px 0 16px; padding-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.18);
+    scroll-margin-top: 72px;
+  }
+  .mb-md h3 {
+    display: flex; align-items: center; gap: 10px;
+    font-family: 'Orbitron', monospace; font-size: 0.74rem; letter-spacing: 0.18em; text-transform: uppercase;
+    color: #9be3a6; margin: 28px 0 12px; scroll-margin-top: 72px;
+  }
+  .mb-md h3::before { content: ''; width: 8px; height: 8px; rotate: 45deg; background: #2a8a3a; box-shadow: 0 0 8px rgba(79,196,99,0.7); flex: none; }
+  .mb-md h4 { font-weight: 600; color: #fff; margin: 20px 0 8px; font-size: 1rem; }
+  .gp-body .mb-md p { margin-bottom: 12px; }
+  .mb-md ul, .mb-md ol { margin: 0 0 14px 1.3em; color: rgba(255,255,255,0.88); line-height: 1.7; }
+  .mb-md li { margin-bottom: 4px; }
+  .mb-md li::marker { color: #4fc463; }
+  .mb-md a { color: #7fdc8e; text-underline-offset: 3px; }
+  .mb-md strong { color: #fff; font-weight: 600; }
+  .mb-md em { color: rgba(255,255,255,0.75); }
+  .mb-md code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.88em; padding: 1px 6px; border-radius: 4px; background: rgba(255,255,255,0.1); }
+  .mb-md blockquote {
+    margin: 0 0 16px; padding: 10px 14px; border-radius: 6px;
+    background: rgba(42,138,58,0.14); border: 1px solid rgba(79,196,99,0.3);
+  }
+  .gp-body .mb-md blockquote p { margin: 0; font-size: 0.92rem; }
+  .mb-md hr { border: 0; border-top: 1px solid rgba(255,255,255,0.15); margin: 28px 0; }
+  .mb-table-wrap { overflow-x: auto; margin: 0 0 18px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.14); }
+  .mb-md table { width: 100%; border-collapse: collapse; font-size: 0.92rem; min-width: 420px; }
+  .mb-md th {
+    text-align: left; padding: 10px 12px; font-family: 'Orbitron', monospace; font-size: 0.64rem; letter-spacing: 0.16em;
+    text-transform: uppercase; color: #9be3a6; background: rgba(42,138,58,0.18); white-space: nowrap;
+  }
+  .mb-md td { padding: 9px 12px; color: rgba(255,255,255,0.88); border-top: 1px solid rgba(255,255,255,0.08); vertical-align: top; font-variant-numeric: tabular-nums; }
+  .mb-md tbody tr:nth-child(even) td { background: rgba(255,255,255,0.03); }
+  .mb-md td:first-child { color: #fff; font-weight: 600; white-space: nowrap; }
+
+  /* Editor */
+  .mb-editor { scroll-margin-top: 72px; }
+  .gp-body .mb-note { font-size: 0.9rem; color: rgba(255,255,255,0.75); }
+  .mb-editor-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 16px 0 20px; }
+  .mb-editor-col { display: flex; flex-direction: column; min-width: 0; }
+  .mb-editor textarea {
+    min-height: 460px; resize: vertical; padding: 14px; border-radius: 6px;
+    font: 0.86rem/1.6 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; color: #e8f0ff;
+    background: rgba(2,4,15,0.7); border: 1px solid rgba(255,255,255,0.22); tab-size: 2;
+  }
+  .mb-preview {
+    min-height: 460px; max-height: 70vh; overflow: auto; padding: 14px; border-radius: 6px;
+    background: rgba(2,4,15,0.45); border: 1px dashed rgba(255,255,255,0.2);
+  }
+  .mb-newpass { border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; padding: 14px 16px 4px; margin-bottom: 18px; max-width: 440px; }
+  .mb-newpass legend { padding: 0 6px; font-family: 'Orbitron', monospace; font-size: 0.66rem; letter-spacing: 0.16em; text-transform: uppercase; color: #9be3a6; }
+  .gp-body .mb-hint-small { font-size: 0.84rem; color: rgba(255,255,255,0.65); }
+  .mb-editor-actions { display: flex; flex-wrap: wrap; gap: 12px; }
+  .gp-body .mb-status { margin: 12px 0 0; font-size: 0.9rem; min-height: 1.4em; }
+  .mb-status.is-error { color: #ff8a8a !important; }
+  .mb-status.is-ok { color: #9be3a6 !important; }
+
+  @media (max-width: 760px) {
+    .mb-editor-grid { grid-template-columns: 1fr; }
+    .mb-editor textarea, .mb-preview { min-height: 300px; }
+    .mb-bar { flex-direction: column; align-items: stretch; }
+    .mb-tools { justify-content: flex-end; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .mb-form.is-shaking .mb-field { animation: none; }
+    .mb-unlocked.is-revealed .mb-bar, .mb-unlocked.is-revealed .mb-content { animation: fade-in 200ms ease-out both; }
+  }
 
   /* ── VIEW TRANSITIONS: entering a guild ──
      The focal moment. Hovering a card already shows the guild's world behind the home;
@@ -939,6 +1084,10 @@
       <div class="gp-actions">
         <a href="https://www.youtube.com/channel/UC9GekaZrZrOOpLCymhJFV7Q" target="_blank" rel="noopener" class="btn btn--red">▶ Follow us on YouTube</a>
         <a href="https://swgoh.gg/g/Tr80nBuNRheBQJ4Wr3JBkQ/" target="_blank" rel="noopener" class="btn btn--orange">✦ Check our SWGOH.GG</a>
+        <a href="#/kinderkarten-members" class="btn btn--green">
+          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7.5a4 4 0 0 1 8 0V11"/></svg>
+          Members area
+        </a>
       </div>
     </div>
     <div class="gp-body" style="background:linear-gradient(to right,rgba(2,4,15,0.35) 0%,rgba(2,4,15,0.78) 30%,rgba(2,4,15,0.85) 50%,rgba(2,4,15,0.78) 70%,rgba(2,4,15,0.35) 100%);">
@@ -1034,6 +1183,95 @@
 </div>
 
 
+<div id="page-kinderkarten-members" class="guild-page members-page" role="dialog" aria-modal="true" aria-labelledby="title-kinderkarten-members" data-parent="kinderkarten" data-title="Members area — Kinderkarten" style="--bg:url(images/bg-kinderkarten.jpg);--accent:#2a8a3a">
+  <div class="gp-progress" aria-hidden="true"></div>
+  <div class="gp-backdrop" aria-hidden="true"></div>
+  <div class="gp-inner">
+    <button class="gp-back" type="button" onclick="closeGuildPage()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="white" aria-hidden="true"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+      Kinderkarten <kbd>Esc</kbd>
+    </button>
+    <div class="gp-header">
+      <p class="gp-label">Nordic Kingdom Kinderkarten</p>
+      <h1 class="gp-h1" id="title-kinderkarten-members">Members area</h1>
+      <p class="gp-devise">Platoons · TB plan · Guild guides</p>
+      <div class="gp-divider">
+        <div class="gp-divider-line"></div>
+        <div class="gp-icon-wrap">
+          <div class="gp-icon-halo"></div>
+          <img class="gp-icon-img" src="images/icon-kinderkarten.svg" alt="">
+        </div>
+        <div class="gp-divider-line r"></div>
+      </div>
+    </div>
+
+    <!-- Locked state -->
+    <div class="gp-body mb-lock" data-mb="lock">
+      <form class="mb-form" data-mb="form" novalidate>
+        <svg class="mb-lock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="10.5" width="16" height="10.5" rx="2"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/><circle cx="12" cy="15.5" r="1.4"/></svg>
+        <h2 class="mb-form-title">Members only</h2>
+        <p class="mb-form-hint">Enter the password shared with Kinderkarten members on the guild Discord.</p>
+        <label class="mb-label" for="mb-password">Password</label>
+        <div class="mb-field">
+          <input id="mb-password" name="password" type="password" autocomplete="current-password" required data-autofocus>
+          <button type="button" class="mb-reveal" data-mb="reveal" aria-label="Show password" aria-pressed="false">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+        <label class="mb-remember"><input type="checkbox" data-mb="remember"> Remember me on this device</label>
+        <button type="submit" class="btn btn--green mb-submit" data-mb="submit">Unlock</button>
+        <p class="mb-error" data-mb="error" role="alert"></p>
+      </form>
+    </div>
+
+    <!-- Unlocked state -->
+    <div class="mb-unlocked" data-mb="unlocked" hidden>
+      <div class="mb-bar">
+        <nav class="mb-toc" data-mb="toc" aria-label="Sections"></nav>
+        <div class="mb-tools">
+          <button type="button" class="mb-tool" data-mb="edit">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16v4z"/><path d="M13.5 6.5l4 4"/></svg>
+            Edit
+          </button>
+          <button type="button" class="mb-tool" data-mb="lockbtn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7.5a4 4 0 0 1 8 0V11"/></svg>
+            Lock
+          </button>
+        </div>
+      </div>
+
+      <article class="gp-body mb-content" data-mb="content"></article>
+
+      <section class="gp-body mb-editor" data-mb="editor" aria-labelledby="mb-editor-title" hidden>
+        <h2 class="gp-history-label" id="mb-editor-title">Edit the members area</h2>
+        <p class="mb-note">Write in Markdown (headings with <code>##</code>, tables with <code>|</code>). Nothing is published from this page: download the encrypted file, then replace <code>kinderkarten-members.data.js</code> in the site (GitHub and Netlify).</p>
+        <div class="mb-editor-grid">
+          <label class="mb-editor-col">
+            <span class="mb-label">Content (Markdown)</span>
+            <textarea data-mb="source" spellcheck="false"></textarea>
+          </label>
+          <div class="mb-editor-col">
+            <span class="mb-label" id="mb-preview-label">Preview</span>
+            <div class="mb-preview mb-md" data-mb="preview" aria-labelledby="mb-preview-label"></div>
+          </div>
+        </div>
+        <fieldset class="mb-newpass">
+          <legend>Change the password (optional)</legend>
+          <label class="mb-label" for="mb-new1">New password</label>
+          <input id="mb-new1" type="password" autocomplete="new-password" data-mb="new1">
+          <label class="mb-label" for="mb-new2">Confirm new password</label>
+          <input id="mb-new2" type="password" autocomplete="new-password" data-mb="new2">
+          <p class="mb-hint-small">Leave empty to keep the current password. Prefer a long passphrase (4–5 random words).</p>
+        </fieldset>
+        <div class="mb-editor-actions">
+          <button type="button" class="btn btn--green" data-mb="download">Download encrypted file</button>
+          <button type="button" class="btn" data-mb="cancel">Close editor</button>
+        </div>
+        <p class="mb-status" data-mb="status" role="status"></p>
+      </section>
+    </div>
+  </div>
+</div>
 <div id="page-nordic-kingdom" class="guild-page" role="dialog" aria-modal="true" aria-labelledby="title-nordic-kingdom" style="--bg:url(images/bg-nordic-kingdom.jpg);--accent:#e03030">
   <div class="gp-progress" aria-hidden="true"></div>
   <div class="gp-backdrop" aria-hidden="true"></div>
@@ -1757,7 +1995,6 @@ const router = (function() {
   document.querySelectorAll('.guild-page').forEach(p => pages.set(p.id.replace(/^page-/, ''), p));
   const baseTitle = document.title;
   let current = null;
-  let openedInApp = false;
   let instantNext = false;
   let activeTransition = null;
 
@@ -1788,9 +2025,14 @@ const router = (function() {
     wrapper.inert = true;
     scrollBtn.inert = true;
     const card = cardOf(id);
-    const full = card ? card.querySelector('h2').textContent.trim() : id;
-    const short = full.replace(/^Nordic Kingdom\s+/, '');
-    document.title = short === full ? baseTitle : short + ' — Nordic Kingdom';
+    if (page.dataset.title) {
+      document.title = page.dataset.title + ' — Nordic Kingdom';
+    } else {
+      const full = card ? card.querySelector('h2').textContent.trim() : id;
+      const short = full.replace(/^Nordic Kingdom\s+/, '');
+      document.title = short === full ? baseTitle : short + ' — Nordic Kingdom';
+    }
+    page.dispatchEvent(new CustomEvent('guildpage:show'));
     preview.clear();
     starfield.stop();
     clearTimeout(page._enterTimer);
@@ -1811,7 +2053,11 @@ const router = (function() {
 
   function focusAfter(prev, next) {
     if (next) {
-      pages.get(next).querySelector('.gp-back')?.focus({ preventScroll: true });
+      const page = pages.get(next);
+      const target = (prev && page.querySelector(`a[href="#/${prev}"]`))
+        || [...page.querySelectorAll('[data-autofocus]')].find(el => el.offsetParent !== null)
+        || page.querySelector('.gp-back');
+      target?.focus({ preventScroll: true });
     } else if (prev) {
       cardOf(prev)?.querySelector('.gc-link')?.focus({ preventScroll: true });
     }
@@ -1911,21 +2157,36 @@ const router = (function() {
 
   function close(instant = false) {
     if (!current) return;
+    const page = pages.get(current);
+    if (page._canClose && !page._canClose()) return;
     instantNext = instant;
-    if (openedInApp) {
-      history.back(); // Back button == browser back, history stays clean
+    if (history.state && history.state.nk) {
+      history.back(); // came here inside the site: Back button == browser back
+    } else if (page.dataset.parent) {
+      history.replaceState(null, '', '#/' + page.dataset.parent);
+      sync();
     } else {
       history.pushState(null, '', location.pathname + location.search);
       sync();
     }
   }
 
-  window.addEventListener('hashchange', () => {
-    if (routeId() && !current) openedInApp = true;
+  // Internal routes (#/guild) are recorded in history, so "Back" knows it can step back
+  document.addEventListener('click', e => {
+    const link = e.target.closest('a[href^="#/"]');
+    if (!link || e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    e.preventDefault();
+    if (link.getAttribute('href') === location.hash) return;
+    history.pushState({ nk: true }, '', link.getAttribute('href'));
     sync();
   });
-  window.addEventListener('popstate', () => { if (!routeId() && current) sync(); });
-  document.addEventListener('keydown', e => { if (e.key === 'Escape' && current) close(true); });
+  window.addEventListener('hashchange', sync);   // URL typed or edited by hand
+  window.addEventListener('popstate', sync);     // browser Back / Forward
+  document.addEventListener('keydown', e => {
+    if (e.key !== 'Escape' || !current) return;
+    if (e.target.closest('input, textarea, select')) return; // Esc in a form field is not "leave the page"
+    close(true);
+  });
 
   // Deep link (e.g. shared URL …/#/kinderkarten): open without animation
   instantNext = true;
@@ -1983,6 +2244,331 @@ document.querySelectorAll('nav.guild-nav a').forEach(link => {
     });
   });
   document.querySelector('main').addEventListener('pointerleave', () => preview.schedule(null, 220));
+})();
+
+/* ── KINDERKARTEN MEMBERS AREA ──
+   The content lives encrypted in kinderkarten-members.data.js (AES-256-GCM, key derived from the
+   password with PBKDF2-SHA-256). It is decrypted in the browser; the password never leaves it. */
+(function() {
+  const page = document.getElementById('page-kinderkarten-members');
+  if (!page) return;
+
+  const DATA_SRC = 'kinderkarten-members.data.js';
+  const LIB_SRC = 'vendor/marked.min.js';
+  const STORE = 'nk-kk-members-key';
+  const ITERATIONS = 600000;
+  const $ = name => page.querySelector(`[data-mb="${name}"]`);
+  const el = {
+    lock: $('lock'), form: $('form'), password: page.querySelector('#mb-password'), reveal: $('reveal'),
+    remember: $('remember'), submit: $('submit'), error: $('error'), unlocked: $('unlocked'), toc: $('toc'),
+    content: $('content'), edit: $('edit'), lockBtn: $('lockbtn'), editor: $('editor'), source: $('source'),
+    preview: $('preview'), new1: $('new1'), new2: $('new2'), download: $('download'), cancel: $('cancel'),
+    status: $('status'),
+  };
+
+  let key = null;        // CryptoKey for the current data
+  let markdown = '';     // decrypted content
+  let dirty = false;
+
+  /* helpers */
+  const toB64 = bytes => {
+    let s = '';
+    const b = new Uint8Array(bytes);
+    for (let i = 0; i < b.length; i += 0x8000) s += String.fromCharCode.apply(null, b.subarray(i, i + 0x8000));
+    return btoa(s);
+  };
+  const fromB64 = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
+  const loaded = {};
+  const loadScript = (src, fresh) => {
+    if (loaded[src] && !fresh) return loaded[src];
+    return loaded[src] = new Promise((resolve, reject) => {
+      const s = document.createElement('script');
+      s.src = src + (fresh ? '?t=' + Date.now() : '');
+      s.onload = resolve;
+      s.onerror = () => { delete loaded[src]; reject(new Error('load ' + src)); };
+      document.head.appendChild(s);
+    });
+  };
+  const data = () => window.NK_KK_MEMBERS;
+  const storage = () => {
+    try { return { s: sessionStorage, l: localStorage }; } catch (e) { return null; }
+  };
+
+  async function deriveKey(password, salt, iterations) {
+    const base = await crypto.subtle.importKey('raw', new TextEncoder().encode(password.normalize('NFC')), 'PBKDF2', false, ['deriveKey']);
+    return crypto.subtle.deriveKey({ name: 'PBKDF2', hash: 'SHA-256', salt, iterations }, base, { name: 'AES-GCM', length: 256 }, true, ['encrypt', 'decrypt']);
+  }
+  async function decryptWith(k) {
+    const d = data();
+    const plain = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: fromB64(d.iv) }, k, fromB64(d.ct));
+    return new TextDecoder().decode(plain);
+  }
+  async function rememberKey(k, persist) {
+    const st = storage();
+    if (!st) return;
+    const raw = toB64(await crypto.subtle.exportKey('raw', k));
+    const value = JSON.stringify({ salt: data().salt, key: raw });
+    st.s.setItem(STORE, value);
+    if (persist) st.l.setItem(STORE, value); else st.l.removeItem(STORE);
+  }
+  function forgetKey() {
+    const st = storage();
+    if (!st) return;
+    st.s.removeItem(STORE);
+    st.l.removeItem(STORE);
+  }
+  async function storedKey() {
+    const st = storage();
+    if (!st) return null;
+    const value = st.s.getItem(STORE) || st.l.getItem(STORE);
+    if (!value) return null;
+    try {
+      const { salt, key: raw } = JSON.parse(value);
+      if (salt !== data().salt) { forgetKey(); return null; } // password changed since
+      return await crypto.subtle.importKey('raw', fromB64(raw), { name: 'AES-GCM' }, true, ['encrypt', 'decrypt']);
+    } catch (e) { forgetKey(); return null; }
+  }
+
+  /* rendering */
+  const slug = t => t.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  function renderMarkdown(md, target, withIds) {
+    target.innerHTML = window.marked.parse(md, { gfm: true, breaks: false });
+    target.querySelectorAll('table').forEach(t => {
+      const wrap = document.createElement('div');
+      wrap.className = 'mb-table-wrap';
+      t.replaceWith(wrap);
+      wrap.appendChild(t);
+    });
+    target.querySelectorAll('a[href]').forEach(a => {
+      const href = a.getAttribute('href');
+      if (/^https?:/i.test(href)) { a.target = '_blank'; a.rel = 'noopener'; }
+    });
+    if (withIds) {
+      const used = {};
+      target.querySelectorAll('h2, h3').forEach(h => {
+        let id = 'mb-' + (slug(h.textContent) || 'section');
+        used[id] = (used[id] || 0) + 1;
+        if (used[id] > 1) id += '-' + used[id];
+        h.id = id;
+      });
+    }
+  }
+  function render() {
+    el.content.classList.add('mb-md');
+    renderMarkdown(markdown, el.content, true);
+    el.toc.innerHTML = '';
+    el.content.querySelectorAll('h2').forEach(h => {
+      const a = document.createElement('a');
+      a.href = '#' + h.id;
+      a.textContent = h.textContent;
+      el.toc.appendChild(a);
+    });
+  }
+
+  // In-page anchors scroll inside the guild page (a plain #hash would be read as a route)
+  page.addEventListener('click', e => {
+    const a = e.target.closest('a[href^="#"]:not([href^="#/"])');
+    if (!a || !page.contains(a)) return;
+    const target = page.querySelector(a.getAttribute('href'));
+    if (!target) return;
+    e.preventDefault();
+    target.scrollIntoView({ behavior: reduceMotion.matches ? 'auto' : 'smooth', block: 'start' });
+  });
+
+  /* states */
+  function showUnlocked(animate) {
+    render();
+    el.lock.hidden = true;
+    el.unlocked.hidden = false;
+    el.unlocked.classList.toggle('is-revealed', !!animate);
+    if (animate) setTimeout(() => el.unlocked.classList.remove('is-revealed'), 700);
+  }
+  function showLocked() {
+    key = null;
+    markdown = '';
+    el.content.innerHTML = '';
+    el.toc.innerHTML = '';
+    closeEditor(true);
+    el.unlocked.hidden = true;
+    el.lock.hidden = false;
+    el.password.value = '';
+    setError('');
+  }
+  function setError(msg) {
+    el.error.textContent = msg;
+    el.form.classList.toggle('is-invalid', !!msg);
+  }
+  function busy(on) {
+    el.submit.disabled = on;
+    el.submit.setAttribute('aria-busy', on ? 'true' : 'false');
+    el.submit.textContent = on ? 'Unlocking…' : 'Unlock';
+  }
+  function shake() {
+    el.form.classList.remove('is-shaking');
+    void el.form.offsetWidth;
+    el.form.classList.add('is-shaking');
+  }
+
+  async function prepare() {
+    if (!window.isSecureContext || !window.crypto || !crypto.subtle) {
+      setError('This page must be opened over HTTPS to unlock.');
+      el.submit.disabled = true;
+      return false;
+    }
+    try {
+      await Promise.all([loadScript(LIB_SRC), loadScript(DATA_SRC)]);
+    } catch (e) {
+      setError('The members file could not be loaded. Check your connection and try again.');
+      return false;
+    }
+    return !!data();
+  }
+
+  page.addEventListener('guildpage:show', async () => {
+    if (key) return;
+    if (!(await prepare())) return;
+    const k = await storedKey();
+    if (!k) return;
+    try {
+      markdown = await decryptWith(k);
+      key = k;
+      showUnlocked(false);
+    } catch (e) { forgetKey(); }
+  });
+
+  el.form.addEventListener('submit', async e => {
+    e.preventDefault();
+    const password = el.password.value;
+    if (!password) { setError('Enter the password.'); shake(); el.password.focus(); return; }
+    if (!(await prepare())) return;
+    busy(true);
+    setError('');
+    try {
+      const d = data();
+      const k = await deriveKey(password, fromB64(d.salt), d.iter || ITERATIONS);
+      markdown = await decryptWith(k);
+      key = k;
+      await rememberKey(k, el.remember.checked);
+      busy(false);
+      showUnlocked(true);
+      el.toc.querySelector('a')?.focus({ preventScroll: true });
+    } catch (err) {
+      busy(false);
+      setError('Wrong password. Try again.');
+      shake();
+      el.password.select();
+    }
+  });
+
+  el.reveal.addEventListener('click', () => {
+    const show = el.password.type === 'password';
+    el.password.type = show ? 'text' : 'password';
+    el.reveal.setAttribute('aria-pressed', String(show));
+    el.reveal.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+    el.password.focus();
+  });
+
+  el.lockBtn.addEventListener('click', () => {
+    if (dirty && !confirm('Discard your unsaved changes?')) return;
+    forgetKey();
+    showLocked();
+    el.password.focus();
+  });
+
+  /* editor */
+  let previewTimer = null;
+  function openEditor() {
+    el.source.value = markdown;
+    renderMarkdown(markdown, el.preview, false);
+    el.new1.value = el.new2.value = '';
+    setStatus('');
+    dirty = false;
+    el.editor.hidden = false;
+    el.content.hidden = true;
+    el.edit.setAttribute('aria-expanded', 'true');
+    el.source.focus({ preventScroll: true });
+    el.editor.scrollIntoView({ behavior: reduceMotion.matches ? 'auto' : 'smooth', block: 'start' });
+  }
+  function closeEditor(force) {
+    if (!force && dirty && !confirm('Discard your unsaved changes?')) return false;
+    dirty = false;
+    el.editor.hidden = true;
+    el.content.hidden = false;
+    el.edit.setAttribute('aria-expanded', 'false');
+    return true;
+  }
+  function setStatus(msg, kind) {
+    el.status.textContent = msg;
+    el.status.className = 'mb-status' + (kind ? ' is-' + kind : '');
+  }
+  el.edit.addEventListener('click', () => { if (el.editor.hidden) openEditor(); else closeEditor(); });
+  el.cancel.addEventListener('click', () => { if (closeEditor()) el.edit.focus(); });
+  el.source.addEventListener('input', () => {
+    dirty = true;
+    clearTimeout(previewTimer);
+    previewTimer = setTimeout(() => renderMarkdown(el.source.value, el.preview, false), 150);
+  });
+  el.source.addEventListener('keydown', e => {
+    if (e.key !== 'Tab' || e.shiftKey) return; // Tab indents; Shift+Tab leaves the field
+    e.preventDefault();
+    el.source.setRangeText('  ', el.source.selectionStart, el.source.selectionEnd, 'end');
+    el.source.dispatchEvent(new Event('input'));
+  });
+
+  el.download.addEventListener('click', async () => {
+    const p1 = el.new1.value, p2 = el.new2.value;
+    if (p1 || p2) {
+      if (p1 !== p2) { setStatus('The two new passwords do not match.', 'error'); el.new2.focus(); return; }
+      if (p1.length < 12) { setStatus('The new password is too short: use at least 12 characters (a passphrase is best).', 'error'); el.new1.focus(); return; }
+    }
+    el.download.disabled = true;
+    setStatus('Encrypting…');
+    try {
+      let k = key, salt = data().salt;
+      if (p1) {
+        const saltBytes = crypto.getRandomValues(new Uint8Array(16));
+        k = await deriveKey(p1, saltBytes, ITERATIONS);
+        salt = toB64(saltBytes);
+      }
+      const iv = crypto.getRandomValues(new Uint8Array(12));
+      const text = el.source.value;
+      const ct = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, k, new TextEncoder().encode(text));
+      const payload = { v: 1, kdf: 'PBKDF2-SHA256', iter: ITERATIONS, cipher: 'AES-256-GCM', salt, iv: toB64(iv), ct: toB64(ct) };
+      const file = '/* Kinderkarten members area: encrypted content (AES-256-GCM, PBKDF2-SHA256).\n'
+        + '   Generated ' + new Date().toISOString().slice(0, 10) + ' from the members page editor. Do not edit by hand. */\n'
+        + 'window.NK_KK_MEMBERS = ' + JSON.stringify(payload) + ';\n';
+      const url = URL.createObjectURL(new Blob([file], { type: 'text/javascript' }));
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = DATA_SRC;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+
+      // Show the new version here right away
+      window.NK_KK_MEMBERS = payload;
+      key = k;
+      markdown = text;
+      await rememberKey(k, !!storage()?.l.getItem(STORE));
+      dirty = false;
+      render();
+      setStatus(p1
+        ? 'Downloaded with the NEW password. Replace kinderkarten-members.data.js on GitHub and Netlify, then share the new password with the members.'
+        : 'Downloaded. Replace kinderkarten-members.data.js on GitHub and Netlify to publish it.', 'ok');
+    } catch (e) {
+      setStatus('Encryption failed: ' + e.message, 'error');
+    } finally {
+      el.download.disabled = false;
+    }
+  });
+
+  // Opened by a deep link before this module was ready
+  if (page.classList.contains('active')) page.dispatchEvent(new CustomEvent('guildpage:show'));
+
+  // Leaving the page with unsaved edits asks first
+  page._canClose = () => !dirty || confirm('Discard your unsaved changes?') && !(dirty = false);
+  window.addEventListener('beforeunload', e => { if (dirty) { e.preventDefault(); e.returnValue = ''; } });
 })();
 
 /* ── SCROLL TO TOP ── */
