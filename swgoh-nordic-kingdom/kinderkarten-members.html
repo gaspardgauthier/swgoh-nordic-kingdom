@@ -295,41 +295,6 @@
   .foot .glyph { font: 1.1rem/1.4 'Aurebesh', sans-serif; letter-spacing: 0.2em; color: var(--kyber); opacity: 0.7; }
   .foot p:last-child { margin-top: 10px; font: 600 0.74rem/1 'Oxanium', sans-serif; letter-spacing: 0.3em; text-transform: uppercase; }
 
-  /* ── Editor drawer ── */
-  .editor {
-    position: fixed; top: var(--hud-h); right: 0; bottom: 0; z-index: 30; width: min(620px, 100%);
-    display: flex; flex-direction: column; gap: 12px; padding: 18px;
-    background: rgba(5, 9, 19, 0.96); border-left: 1px solid var(--line-strong);
-    backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-    transform: translateX(100%); visibility: hidden;
-    transition: transform 360ms var(--ease-out), visibility 0s linear 360ms;
-  }
-  .editor.is-open { transform: none; visibility: visible; transition: transform 420ms var(--ease-out); }
-  .editor h2 { font: 700 0.9rem/1 'Oxanium', sans-serif; letter-spacing: 0.22em; text-transform: uppercase; }
-  .editor p { font-size: 0.88rem; color: var(--muted); }
-  .editor textarea {
-    flex: 1; min-height: 200px; resize: none; padding: 12px; border-radius: 6px; tab-size: 2;
-    font: 0.84rem/1.55 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; color: #e8f0ff;
-    background: rgba(0, 0, 0, 0.45); border: 1px solid var(--line);
-  }
-  .editor textarea:focus-visible, .editor input:focus-visible { outline: none; border-color: var(--holo); box-shadow: 0 0 0 3px rgba(116, 230, 255, 0.2); }
-  .editor .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-  .editor label { display: flex; flex-direction: column; gap: 6px; font: 600 0.66rem/1 'Oxanium', sans-serif; letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); }
-  .editor input { padding: 10px; border-radius: 6px; font: 500 0.95rem 'Chakra Petch', sans-serif; color: #fff; background: rgba(0, 0, 0, 0.45); border: 1px solid var(--line); }
-  .editor .actions { display: flex; flex-wrap: wrap; gap: 10px; }
-  .btn-primary {
-    display: inline-flex; align-items: center; gap: 8px; padding: 11px 16px; border-radius: 6px; cursor: pointer;
-    font: 700 0.74rem/1 'Oxanium', sans-serif; letter-spacing: 0.16em; text-transform: uppercase;
-    color: #03140a; background: var(--kyber); border: 1px solid var(--kyber); box-shadow: 0 6px 24px -8px rgba(141, 255, 178, 0.7);
-    transition: scale 160ms var(--ease-out), filter 200ms ease;
-  }
-  .btn-primary:active { scale: 0.97; }
-  .btn-primary:disabled { opacity: 0.6; cursor: progress; }
-  @media (hover: hover) and (pointer: fine) { .btn-primary:hover { filter: brightness(1.08); } }
-  .status { min-height: 1.4em; font-size: 0.88rem; }
-  .status.is-error { color: #ff8a8a; }
-  .status.is-ok { color: var(--kyber); }
-
   /* ── Responsive ── */
   @media (max-width: 900px) {
     .nav { display: none; }
@@ -351,7 +316,6 @@
     .hud-btn .lbl { display: none; }
     .hud-btn { padding: 9px; }
     .grid { grid-template-columns: 1fr; }
-    .editor .row { grid-template-columns: 1fr; }
   }
 
   /* ── Reduced motion: no travel, no scan, no stagger; states stay legible ── */
@@ -361,7 +325,6 @@
     .phase.is-scanned::after { animation: none; }
     .js .grid.will-deal .card, .js .grid.is-dealt .card { opacity: 1; transform: none; transition: none; }
     .gate-ring { animation-duration: 2.4s; }
-    .editor, .editor.is-open { transition: visibility 0s; }
     .nav-ink { transition: opacity 200ms ease; }
   }
 </style>
@@ -380,10 +343,6 @@
     <span class="nav-ink" aria-hidden="true"></span>
   </nav>
   <div class="hud-actions">
-    <button class="hud-btn" type="button" data-action="edit" aria-controls="editor" aria-expanded="false">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16v4z"/><path d="M13.5 6.5l4 4"/></svg>
-      <span class="lbl">Edit</span>
-    </button>
     <button class="hud-btn" type="button" data-action="lock" aria-label="Lock and leave">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7.5a4 4 0 0 1 8 0V11"/></svg>
       <span class="lbl">Lock</span>
@@ -405,21 +364,6 @@
 
 <main id="main" hidden></main>
 
-<aside class="editor" id="editor" aria-labelledby="editor-title" aria-hidden="true">
-  <h2 id="editor-title">Edit the War Room</h2>
-  <p>Markdown. Changes preview live on this page. Nothing is published from here: download the encrypted file, then replace <code>kinderkarten-members.data.js</code> on GitHub and Netlify.</p>
-  <textarea id="editor-source" spellcheck="false" aria-label="Content (Markdown)"></textarea>
-  <div class="row">
-    <label>New password (optional)<input id="editor-new1" type="password" autocomplete="new-password"></label>
-    <label>Confirm new password<input id="editor-new2" type="password" autocomplete="new-password"></label>
-  </div>
-  <div class="actions">
-    <button class="btn-primary" type="button" id="editor-download">Download encrypted file</button>
-    <button class="hud-btn" type="button" id="editor-close">Close</button>
-  </div>
-  <p class="status" id="editor-status" role="status"></p>
-</aside>
-
 <script src="vendor/marked.min.js"></script>
 <script src="vendor/three.min.js"></script>
 <script src="kinderkarten-members.data.js"></script>
@@ -428,7 +372,6 @@
   'use strict';
   const STORE = 'nk-kk-members-key';
   const WARP_FLAG = 'nk-kk-warp';
-  const ITERATIONS = 600000;
   const LOCK_URL = 'index.html#/kinderkarten-members';
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)');
@@ -436,7 +379,6 @@
   const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
   /* ───────── Crypto ───────── */
-  const toB64 = bytes => { let s = ''; const b = new Uint8Array(bytes); for (let i = 0; i < b.length; i += 0x8000) s += String.fromCharCode.apply(null, b.subarray(i, i + 0x8000)); return btoa(s); };
   const fromB64 = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
   const store = () => { try { return { s: sessionStorage, l: localStorage }; } catch (e) { return null; } };
   async function storedKey() {
@@ -448,18 +390,7 @@
       return await crypto.subtle.importKey('raw', fromB64(v.key), { name: 'AES-GCM' }, true, ['encrypt', 'decrypt']);
     } catch (e) { return null; }
   }
-  async function saveKey(k) {
-    const st = store(); if (!st) return;
-    const v = JSON.stringify({ salt: window.NK_KK_MEMBERS.salt, key: toB64(await crypto.subtle.exportKey('raw', k)) });
-    st.s.setItem(STORE, v);
-    if (st.l.getItem(STORE)) st.l.setItem(STORE, v);
-  }
   function forgetKey() { const st = store(); if (st) { st.s.removeItem(STORE); st.l.removeItem(STORE); } }
-  async function deriveKey(password, salt) {
-    const base = await crypto.subtle.importKey('raw', new TextEncoder().encode(password.normalize('NFC')), 'PBKDF2', false, ['deriveKey']);
-    return crypto.subtle.deriveKey({ name: 'PBKDF2', hash: 'SHA-256', salt, iterations: ITERATIONS }, base, { name: 'AES-GCM', length: 256 }, true, ['encrypt', 'decrypt']);
-  }
-
   /* ───────── Parsing the Markdown into the War Room ───────── */
   const LANES = [
     { id: 'ls', label: 'Light side', color: '#5cb8ff', re: /\b(LS\d?|Kafrene)\b/i },
@@ -1054,43 +985,7 @@
     return { setScroll, setLanes, startWarp };
   }
 
-  /* ───────── Editor ───────── */
-  let key = null, markdown = '', dirty = false;
-  function setupEditor() {
-    const ed = $('#editor'), src = $('#editor-source'), status = $('#editor-status'), btn = document.querySelector('[data-action="edit"]');
-    const setStatus = (m, k) => { status.textContent = m; status.className = 'status' + (k ? ' is-' + k : ''); };
-    const open = () => { src.value = markdown; ed.classList.add('is-open'); ed.setAttribute('aria-hidden', 'false'); btn.setAttribute('aria-expanded', 'true'); setStatus(''); setTimeout(() => src.focus({ preventScroll: true }), 50); };
-    const close = () => { if (dirty && !confirm('Discard your unsaved changes?')) return; if (dirty) { dirty = false; render(markdown); wire(false); onScroll(); } ed.classList.remove('is-open'); ed.setAttribute('aria-hidden', 'true'); btn.setAttribute('aria-expanded', 'false'); btn.focus(); };
-    btn.addEventListener('click', () => ed.classList.contains('is-open') ? close() : open());
-    $('#editor-close').addEventListener('click', close);
-    document.addEventListener('keydown', e => { if (e.key === 'Escape' && ed.classList.contains('is-open') && e.target === document.body) close(); });
-    let t = null;
-    src.addEventListener('input', () => { dirty = true; clearTimeout(t); t = setTimeout(() => { render(src.value); wire(false); currentPhase = -1; onScroll(); }, 450); });
-    src.addEventListener('keydown', e => { if (e.key === 'Tab' && !e.shiftKey) { e.preventDefault(); src.setRangeText('  ', src.selectionStart, src.selectionEnd, 'end'); src.dispatchEvent(new Event('input')); } });
-    $('#editor-download').addEventListener('click', async () => {
-      const p1 = $('#editor-new1').value, p2 = $('#editor-new2').value;
-      if (p1 || p2) {
-        if (p1 !== p2) { setStatus('The two new passwords do not match.', 'error'); return; }
-        if (p1.length < 8) { setStatus('The new password is too short (8 characters minimum, longer is safer).', 'error'); return; }
-      }
-      const b = $('#editor-download'); b.disabled = true; setStatus('Encrypting…');
-      try {
-        let k = key, salt = window.NK_KK_MEMBERS.salt;
-        if (p1) { const s = crypto.getRandomValues(new Uint8Array(16)); k = await deriveKey(p1, s); salt = toB64(s); }
-        const iv = crypto.getRandomValues(new Uint8Array(12));
-        const ct = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, k, new TextEncoder().encode(src.value));
-        const payload = { v: 1, kdf: 'PBKDF2-SHA256', iter: ITERATIONS, cipher: 'AES-256-GCM', salt, iv: toB64(iv), ct: toB64(ct) };
-        const file = '/* Kinderkarten members area: encrypted content (AES-256-GCM, PBKDF2-SHA256).\n   Generated ' + new Date().toISOString().slice(0, 10) + ' from the War Room editor. Do not edit by hand. */\nwindow.NK_KK_MEMBERS = ' + JSON.stringify(payload) + ';\n';
-        const url = URL.createObjectURL(new Blob([file], { type: 'text/javascript' }));
-        const a = document.createElement('a'); a.href = url; a.download = 'kinderkarten-members.data.js'; document.body.appendChild(a); a.click(); a.remove();
-        setTimeout(() => URL.revokeObjectURL(url), 1000);
-        window.NK_KK_MEMBERS = payload; key = k; markdown = src.value; dirty = false; await saveKey(k);
-        setStatus(p1 ? 'Downloaded with the NEW password. Replace kinderkarten-members.data.js on GitHub and Netlify, then share the new password.' : 'Downloaded. Replace kinderkarten-members.data.js on GitHub and Netlify to publish it.', 'ok');
-      } catch (e) { setStatus('Encryption failed: ' + e.message, 'error'); }
-      finally { b.disabled = false; }
-    });
-    addEventListener('beforeunload', e => { if (dirty) { e.preventDefault(); e.returnValue = ''; } });
-  }
+  let key = null, markdown = '';
 
   /* ───────── Boot ───────── */
   async function boot() {
@@ -1117,7 +1012,6 @@
     $('#main').hidden = false;
     scene = makeScene();
     wire(true);
-    setupEditor();
     addEventListener('scroll', onScroll, { passive: true });
     addEventListener('resize', onScroll);
     onScroll();
@@ -1125,8 +1019,7 @@
     gate.classList.add('is-done');
 
     document.querySelector('[data-action="lock"]').addEventListener('click', () => {
-      if (dirty && !confirm('Discard your unsaved changes?')) return;
-      dirty = false; forgetKey(); location.href = 'index.html#/kinderkarten-members';
+      forgetKey(); location.href = 'index.html#/kinderkarten-members';
     });
   }
   boot();
