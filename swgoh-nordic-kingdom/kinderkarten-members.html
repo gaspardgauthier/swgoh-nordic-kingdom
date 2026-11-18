@@ -1,0 +1,1136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>War Room — Kinderkarten</title>
+<link rel="icon" type="image/png" href="images/icon-nordic-kingdom.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@500;700;800&family=Chakra+Petch:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<script>document.documentElement.classList.add('js');</script>
+<style>
+  @font-face { font-family: 'Aurebesh'; src: url('fonts/aurebesh.ttf') format('truetype'); font-display: swap; }
+
+  :root {
+    --void: #03050b;
+    --deck: rgba(8, 14, 28, 0.72);
+    --deck-solid: #0a1222;
+    --line: rgba(120, 220, 255, 0.16);
+    --line-strong: rgba(120, 220, 255, 0.38);
+    --holo: #74e6ff;
+    --kyber: #8dffb2;
+    --ls: #5cb8ff;
+    --mx: #ffb547;
+    --ds: #ff4d5e;
+    --zeffo: #b48cff;
+    --mando: #6af0d0;
+    --text: #e2ecff;
+    --muted: #93a4c6;
+    --faint: #5e6f92;
+    --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+    --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+    --hud-h: 64px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { overflow-x: clip; scroll-behavior: smooth; scrollbar-color: rgba(116, 230, 255, 0.3) transparent; scroll-padding-top: calc(var(--hud-h) + 16px); }
+  body {
+    min-height: 100vh;
+    color: var(--text);
+    font: 400 1rem/1.6 'Chakra Petch', system-ui, sans-serif;
+    background:
+      radial-gradient(ellipse 70% 55% at 12% 100%, rgba(40, 140, 90, 0.22), transparent 70%),
+      radial-gradient(ellipse 60% 45% at 92% 8%, rgba(150, 30, 60, 0.16), transparent 70%),
+      radial-gradient(ellipse 90% 70% at 50% 40%, rgba(20, 60, 120, 0.22), transparent 75%),
+      var(--void);
+    background-attachment: fixed;
+    -webkit-font-smoothing: antialiased;
+  }
+  ::selection { background: rgba(116, 230, 255, 0.35); color: #fff; }
+  a { color: var(--holo); text-underline-offset: 3px; }
+  button { font: inherit; color: inherit; }
+  :focus-visible { outline: 2px solid var(--holo); outline-offset: 3px; border-radius: 4px; }
+
+  /* ── Scene layers ── */
+  #scene { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; display: block; }
+  .fx { position: fixed; inset: 0; pointer-events: none; z-index: 1; }
+  .fx-vignette { background: radial-gradient(ellipse 120% 90% at 50% 50%, transparent 55%, rgba(0, 0, 0, 0.65) 100%); }
+  .fx-scan {
+    background: repeating-linear-gradient(to bottom, rgba(255, 255, 255, 0.025) 0 1px, transparent 1px 3px);
+    mix-blend-mode: overlay;
+    opacity: 0.6;
+  }
+
+  /* ── HUD ── */
+  .hud {
+    position: fixed; inset: 0 0 auto 0; height: var(--hud-h); z-index: 20;
+    display: flex; align-items: center; justify-content: space-between; gap: 16px;
+    padding: 0 clamp(16px, 3vw, 40px);
+    background: linear-gradient(to bottom, rgba(3, 5, 11, 0.9), rgba(3, 5, 11, 0.55));
+    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--line);
+  }
+  .brand { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--text); min-width: 0; }
+  .brand img { width: 26px; height: 26px; filter: drop-shadow(0 0 6px rgba(141, 255, 178, 0.7)); }
+  .brand b { font: 700 0.86rem/1 'Oxanium', sans-serif; letter-spacing: 0.22em; text-transform: uppercase; white-space: nowrap; }
+  .brand span { font: 500 0.72rem/1 'Oxanium', sans-serif; letter-spacing: 0.22em; color: var(--kyber); white-space: nowrap; }
+  .nav { position: relative; display: flex; gap: 4px; }
+  .nav a {
+    position: relative; padding: 10px 14px; text-decoration: none; color: var(--muted);
+    font: 600 0.74rem/1 'Oxanium', sans-serif; letter-spacing: 0.18em; text-transform: uppercase;
+    transition: color 200ms ease;
+  }
+  .nav a[aria-current="true"] { color: #fff; }
+  .nav-ink {
+    position: absolute; left: 0; bottom: -1px; height: 2px; width: 1px; transform-origin: 0 50%;
+    background: var(--holo); box-shadow: 0 0 10px var(--holo);
+    transition: transform 420ms var(--ease-out), opacity 200ms ease;
+  }
+  .hud-actions { display: flex; gap: 8px; }
+  .hud-btn {
+    display: inline-flex; align-items: center; gap: 8px; padding: 8px 12px; cursor: pointer; text-decoration: none;
+    font: 600 0.7rem/1 'Oxanium', sans-serif; letter-spacing: 0.16em; text-transform: uppercase; color: var(--text);
+    background: rgba(116, 230, 255, 0.06); border: 1px solid var(--line); border-radius: 4px;
+    transition: border-color 200ms ease, background-color 200ms ease, scale 160ms var(--ease-out);
+  }
+  .hud-btn svg { width: 14px; height: 14px; }
+  .hud-btn:active { scale: 0.97; }
+  @media (hover: hover) and (pointer: fine) {
+    .nav a:hover { color: #fff; }
+    .hud-btn:hover { border-color: var(--line-strong); background: rgba(116, 230, 255, 0.12); }
+  }
+
+  /* ── Gate (decrypting / access) ── */
+  .gate {
+    position: fixed; inset: 0; z-index: 40; display: grid; place-items: center; text-align: center; padding: 24px;
+    background: radial-gradient(ellipse at center, rgba(3, 5, 11, 0.4), rgba(3, 5, 11, 0.95));
+    transition: opacity 500ms var(--ease-out), visibility 0s linear 500ms;
+  }
+  .gate.is-done { opacity: 0; visibility: hidden; }
+  .gate p { font: 600 0.8rem/1.6 'Oxanium', sans-serif; letter-spacing: 0.3em; text-transform: uppercase; color: var(--holo); }
+  .gate .gate-sub { margin-top: 10px; font: 400 0.95rem/1.6 'Chakra Petch', sans-serif; letter-spacing: 0; text-transform: none; color: var(--muted); }
+  .gate-ring { width: 46px; height: 46px; margin: 0 auto 18px; border-radius: 50%; border: 2px solid var(--line); border-top-color: var(--holo); animation: spin 900ms linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── Layout ── */
+  main { position: relative; z-index: 2; }
+  .wrap { width: min(1240px, 100% - 2 * clamp(16px, 4vw, 48px)); margin: 0 auto; }
+  section { position: relative; }
+
+  /* ── Hero ── */
+  .hero { min-height: 100svh; display: flex; align-items: flex-end; padding: calc(var(--hud-h) + 40px) 0 clamp(48px, 10vh, 110px); }
+  .hero-inner { max-width: 880px; }
+  .hero-title {
+    font: 800 clamp(3.4rem, 11vw, 9.6rem)/0.9 'Oxanium', sans-serif; letter-spacing: -0.02em; text-transform: uppercase;
+    color: #f2fbff;
+    text-shadow: 0 2px 30px rgba(116, 230, 255, 0.45), 0 1px 2px rgba(0, 0, 0, 0.6);
+    margin-bottom: 22px;
+  }
+  .hero-title .word { display: inline-block; white-space: nowrap; }
+  .hero-title .ch { display: inline-block; }
+  .hero-title .ch.is-glyph { font-family: 'Aurebesh', sans-serif; font-weight: 400; color: var(--holo); text-shadow: 0 0 18px rgba(116, 230, 255, 0.8); }
+  .hero-by { font-size: clamp(1rem, 2vw, 1.25rem); color: var(--muted); margin-bottom: 34px; }
+  .hero-by b { color: var(--text); font-weight: 600; }
+  .hero-stats { display: flex; flex-wrap: wrap; gap: clamp(20px, 5vw, 56px); align-items: flex-end; }
+  .stat { display: flex; flex-direction: column; gap: 6px; }
+  .stat-value { font: 800 clamp(2.4rem, 6vw, 4.2rem)/1 'Oxanium', sans-serif; color: #fff; font-variant-numeric: tabular-nums; display: flex; align-items: center; gap: 10px; }
+  .stat-value svg { width: 0.62em; height: 0.62em; color: #ffd75e; filter: drop-shadow(0 0 12px rgba(255, 215, 94, 0.7)); }
+  .stat-label { font: 600 0.7rem/1 'Oxanium', sans-serif; letter-spacing: 0.24em; text-transform: uppercase; color: var(--muted); }
+  .stat.is-main .stat-value { font-size: clamp(3.4rem, 9vw, 6.4rem); color: #ffe9a8; text-shadow: 0 0 34px rgba(255, 200, 80, 0.45); }
+  .scroll-cue {
+    position: absolute; right: clamp(16px, 4vw, 48px); bottom: clamp(40px, 9vh, 100px);
+    display: flex; flex-direction: column; align-items: center; gap: 12px;
+    font: 600 0.66rem/1 'Oxanium', sans-serif; letter-spacing: 0.3em; text-transform: uppercase; color: var(--muted);
+    writing-mode: vertical-rl; text-decoration: none;
+    transition: opacity 400ms ease;
+  }
+  .scroll-cue::after { content: ''; width: 1px; height: 64px; background: linear-gradient(var(--holo), transparent); }
+  .scrolled .scroll-cue { opacity: 0; pointer-events: none; }
+
+  /* ── Section headings ── */
+  .sec-head { display: flex; align-items: flex-end; justify-content: space-between; flex-wrap: wrap; gap: 18px; margin-bottom: 36px; }
+  .sec-title { font: 800 clamp(2.2rem, 5.5vw, 4.4rem)/0.95 'Oxanium', sans-serif; letter-spacing: -0.01em; text-transform: uppercase; color: #f2fbff; }
+  .sec-glyph { display: block; margin-top: 10px; font: 0.9rem/1 'Aurebesh', sans-serif; letter-spacing: 0.3em; color: var(--holo); opacity: 0.55; }
+  .sec-note { color: var(--muted); max-width: 420px; }
+
+  /* ── TB plan ── */
+  .plan { padding: 14vh 0 10vh; }
+  .plan-grid { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: clamp(24px, 4vw, 64px); }
+  .plan-hud { position: sticky; top: calc(var(--hud-h) + 24px); align-self: start; height: calc(100svh - var(--hud-h) - 48px); display: flex; flex-direction: column; justify-content: flex-end; pointer-events: none; }
+  .plan-hud-box { pointer-events: auto; background: var(--deck); border: 1px solid var(--line); border-radius: 10px; padding: 18px 20px; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); max-width: 380px; }
+  .phase-counter { display: flex; align-items: baseline; gap: 10px; margin-bottom: 14px; font-family: 'Oxanium', sans-serif; white-space: nowrap; flex: none; }
+  .phase-counter .now { font-size: 3rem; font-weight: 800; line-height: 1; color: #fff; font-variant-numeric: tabular-nums; }
+  .phase-counter .of { color: var(--muted); font-weight: 600; letter-spacing: 0.12em; }
+  .phase-counter .lbl { margin-left: auto; font-size: 0.66rem; letter-spacing: 0.24em; text-transform: uppercase; color: var(--muted); }
+  .lanes { list-style: none; display: grid; gap: 8px; }
+  .lane { display: grid; grid-template-columns: 12px 1fr auto; align-items: center; gap: 10px; font-size: 0.92rem; color: var(--muted); transition: color 300ms ease; }
+  .lane i { width: 10px; height: 10px; border-radius: 50%; background: var(--c); box-shadow: 0 0 0 0 var(--c); opacity: 0.35; transition: opacity 300ms ease, box-shadow 300ms ease; }
+  .lane em { font-style: normal; font: 600 0.66rem/1 'Oxanium', sans-serif; letter-spacing: 0.16em; text-transform: uppercase; color: var(--faint); transition: color 300ms ease; }
+  .lane[data-state]:not([data-state="off"]) { color: var(--text); }
+  .lane[data-state]:not([data-state="off"]) i { opacity: 1; box-shadow: 0 0 10px 1px var(--c); }
+  .lane[data-state="stars"] em { color: #ffd75e; }
+  .lane[data-state="preload"] em { color: var(--holo); }
+  .lane[data-state="cms"] em { color: var(--zeffo); }
+  .lane[data-state="avoid"] em { color: var(--ds); }
+
+  .phases { display: flex; flex-direction: column; gap: 18vh; padding: 6vh 0 12vh; }
+  .phase {
+    position: relative; padding: 26px clamp(18px, 3vw, 32px) 28px; border-radius: 12px;
+    background: var(--deck); border: 1px solid var(--line);
+    backdrop-filter: blur(10px) saturate(1.2); -webkit-backdrop-filter: blur(10px) saturate(1.2);
+    box-shadow: 0 24px 60px -30px rgba(0, 0, 0, 0.8);
+    transition: border-color 400ms ease, box-shadow 400ms ease, opacity 400ms ease;
+    opacity: 0.72;
+  }
+  .phase.is-active { opacity: 1; border-color: var(--line-strong); box-shadow: 0 24px 60px -30px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(116, 230, 255, 0.12), 0 0 40px -8px rgba(116, 230, 255, 0.25); }
+  .phase-index {
+    position: absolute; top: 12px; right: 18px; font: 800 clamp(2.8rem, 5vw, 4.2rem)/1 'Oxanium', sans-serif;
+    color: transparent; -webkit-text-stroke: 1px rgba(116, 230, 255, 0.45); pointer-events: none; user-select: none;
+    transition: color 400ms ease, -webkit-text-stroke-color 400ms ease;
+  }
+  .phase.is-active .phase-index { color: rgba(116, 230, 255, 0.12); -webkit-text-stroke-color: rgba(116, 230, 255, 0.9); }
+  .phase h3 { padding-right: 4.5rem; font: 700 1.3rem/1.2 'Oxanium', sans-serif; letter-spacing: 0.08em; text-transform: uppercase; color: #fff; margin-bottom: 16px; }
+  .targets { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; list-style: none; }
+  .target {
+    display: inline-flex; align-items: center; gap: 8px; padding: 7px 12px; border-radius: 999px;
+    font: 600 0.82rem/1.2 'Chakra Petch', sans-serif; color: #fff;
+    background: color-mix(in srgb, var(--c) 16%, transparent); border: 1px solid color-mix(in srgb, var(--c) 55%, transparent);
+  }
+  .target::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--c); box-shadow: 0 0 8px var(--c); flex: none; }
+  .target[data-state="preload"] { border-style: dashed; }
+  .target[data-state="avoid"] { --c: var(--ds); background: rgba(255, 77, 94, 0.12); }
+  .md p { margin-bottom: 10px; color: rgba(226, 236, 255, 0.9); }
+  .md ul, .md ol { margin: 0 0 12px 1.2em; }
+  .md li { margin-bottom: 6px; }
+  .md li::marker { color: var(--holo); }
+  .md strong { color: #fff; font-weight: 600; }
+  .md em { color: var(--muted); }
+  .md code { font-size: 0.9em; padding: 1px 6px; border-radius: 4px; background: rgba(255, 255, 255, 0.08); }
+  .md h3, .md h4 { font: 700 1rem/1.3 'Oxanium', sans-serif; letter-spacing: 0.1em; text-transform: uppercase; color: #fff; margin: 22px 0 10px; }
+  .md table { width: 100%; border-collapse: collapse; margin-bottom: 14px; }
+  .md th, .md td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); }
+  .mission {
+    display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px 6px 10px; border-radius: 6px; text-decoration: none;
+    color: #fff; font-weight: 600; background: rgba(88, 101, 242, 0.22); border: 1px solid rgba(88, 101, 242, 0.6);
+    transition: background-color 200ms ease, border-color 200ms ease;
+  }
+  .mission svg { width: 16px; height: 16px; flex: none; }
+  @media (hover: hover) and (pointer: fine) { .mission:hover { background: rgba(88, 101, 242, 0.42); border-color: rgba(120, 132, 255, 1); } }
+
+  /* Holographic scan-in for phase panels (scroll-triggered, once) */
+  .js .phase.will-scan { clip-path: inset(0 0 100% 0 round 12px); }
+  .js .phase.is-scanned { clip-path: inset(0 0 0 0 round 12px); transition: clip-path 800ms var(--ease-out), border-color 400ms ease, box-shadow 400ms ease, opacity 400ms ease; }
+  .phase::after {
+    content: ''; position: absolute; left: 0; right: 0; top: 0; height: 2px; border-radius: 2px; pointer-events: none;
+    background: linear-gradient(90deg, transparent, var(--holo), transparent); box-shadow: 0 0 14px var(--holo); opacity: 0;
+  }
+  .phase.is-scanned::after { animation: scanline 800ms var(--ease-out); }
+  @keyframes scanline { 0% { opacity: 1; transform: translateY(0); } 85% { opacity: 1; } 100% { opacity: 0; transform: translateY(var(--h, 300px)); } }
+
+  /* ── Roster ── */
+  .roster { padding: 16vh 0 10vh; }
+  .roster-stats { display: flex; flex-wrap: wrap; gap: clamp(20px, 4vw, 48px); margin-bottom: 30px; }
+  .roster-tools {
+    position: sticky; top: calc(var(--hud-h) + 10px); z-index: 5; display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px;
+    padding: 12px; margin-bottom: 22px; border-radius: 10px; background: rgba(5, 9, 19, 0.82); border: 1px solid var(--line);
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  }
+  .search { position: relative; flex: 1 1 280px; }
+  .search svg { position: absolute; left: 12px; top: 50%; translate: 0 -50%; width: 16px; height: 16px; color: var(--muted); }
+  .search input {
+    width: 100%; padding: 11px 12px 11px 38px; border-radius: 6px; font: 500 0.98rem 'Chakra Petch', sans-serif; color: #fff;
+    background: rgba(0, 0, 0, 0.35); border: 1px solid var(--line); caret-color: var(--holo);
+    transition: border-color 160ms ease, box-shadow 160ms ease;
+  }
+  .search input::placeholder { color: var(--faint); }
+  .search input:focus-visible { outline: none; border-color: var(--holo); box-shadow: 0 0 0 3px rgba(116, 230, 255, 0.2); }
+  .legend { display: flex; flex-wrap: wrap; gap: 8px; list-style: none; }
+  .result-count { font: 600 0.7rem/1 'Oxanium', sans-serif; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); min-width: 9ch; text-align: right; }
+
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 14px; }
+  .card {
+    position: relative; padding: 16px 16px 18px; border-radius: 10px; background: var(--deck); border: 1px solid var(--line);
+    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); overflow: hidden;
+    --px: 50%; --py: 0%;
+  }
+  .card::before {
+    content: ''; position: absolute; inset: 0; pointer-events: none; opacity: 0; transition: opacity 250ms ease;
+    background: radial-gradient(240px circle at var(--px) var(--py), rgba(116, 230, 255, 0.16), transparent 60%);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .card:hover { border-color: var(--line-strong); }
+    .card:hover::before { opacity: 1; }
+  }
+  .card-head { display: flex; align-items: baseline; gap: 10px; margin-bottom: 12px; }
+  .card-num { font: 700 0.78rem/1 'Oxanium', sans-serif; color: var(--holo); font-variant-numeric: tabular-nums; letter-spacing: 0.06em; }
+  .card-name { font: 700 1.06rem/1.25 'Oxanium', sans-serif; color: #fff; overflow-wrap: anywhere; }
+  .card-count { margin-left: auto; font: 600 0.66rem/1 'Oxanium', sans-serif; letter-spacing: 0.14em; color: var(--muted); text-transform: uppercase; white-space: nowrap; }
+  .units { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+  .unit { display: flex; align-items: center; gap: 8px; font-size: 0.92rem; color: rgba(226, 236, 255, 0.92); line-height: 1.3; }
+  .relic {
+    flex: none; min-width: 2.5em; padding: 3px 0; text-align: center; border-radius: 4px;
+    font: 700 0.72rem/1 'Oxanium', sans-serif; letter-spacing: 0.04em; color: #04110a; background: var(--rc); box-shadow: 0 0 10px -2px var(--rc);
+  }
+  .relic[data-r="9"] { --rc: var(--kyber); }
+  .relic[data-r="8"] { --rc: var(--holo); }
+  .relic[data-r="7"] { --rc: var(--mx); }
+  .relic[data-r="6"], .relic[data-r="5"], .relic[data-r="4"] { --rc: #ff8a7a; }
+  .relic[data-t="T"] { background: transparent; color: var(--rc); box-shadow: inset 0 0 0 1px var(--rc); }
+  .note { flex: none; padding: 2px 6px; border-radius: 3px; font: 600 0.62rem/1.2 'Oxanium', sans-serif; letter-spacing: 0.12em; text-transform: uppercase; color: var(--mx); border: 1px solid rgba(255, 181, 71, 0.5); }
+  .card.is-empty .card-name { color: var(--muted); }
+  .empty-note { font-size: 0.9rem; color: var(--faint); font-style: italic; }
+  .card mark { background: rgba(116, 230, 255, 0.28); color: #fff; border-radius: 2px; padding: 0 1px; }
+  .card[hidden] { display: none; }
+  .no-results { padding: 40px 0; text-align: center; color: var(--muted); }
+
+  .js .grid.will-deal .card { opacity: 0; transform: translateY(12px); }
+  .js .grid.is-dealt .card { opacity: 1; transform: none; transition: opacity 420ms var(--ease-out) var(--d, 0ms), transform 520ms var(--ease-out) var(--d, 0ms); }
+
+  /* ── Guides & footer ── */
+  .guides { padding: 16vh 0 14vh; }
+  .guides-body { max-width: 780px; padding: 26px clamp(18px, 3vw, 32px); border-radius: 12px; background: var(--deck); border: 1px solid var(--line); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+  .foot { padding: 60px 0 80px; text-align: center; color: var(--muted); }
+  .foot .glyph { font: 1.1rem/1.4 'Aurebesh', sans-serif; letter-spacing: 0.2em; color: var(--kyber); opacity: 0.7; }
+  .foot p:last-child { margin-top: 10px; font: 600 0.74rem/1 'Oxanium', sans-serif; letter-spacing: 0.3em; text-transform: uppercase; }
+
+  /* ── Editor drawer ── */
+  .editor {
+    position: fixed; top: var(--hud-h); right: 0; bottom: 0; z-index: 30; width: min(620px, 100%);
+    display: flex; flex-direction: column; gap: 12px; padding: 18px;
+    background: rgba(5, 9, 19, 0.96); border-left: 1px solid var(--line-strong);
+    backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+    transform: translateX(100%); visibility: hidden;
+    transition: transform 360ms var(--ease-out), visibility 0s linear 360ms;
+  }
+  .editor.is-open { transform: none; visibility: visible; transition: transform 420ms var(--ease-out); }
+  .editor h2 { font: 700 0.9rem/1 'Oxanium', sans-serif; letter-spacing: 0.22em; text-transform: uppercase; }
+  .editor p { font-size: 0.88rem; color: var(--muted); }
+  .editor textarea {
+    flex: 1; min-height: 200px; resize: none; padding: 12px; border-radius: 6px; tab-size: 2;
+    font: 0.84rem/1.55 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; color: #e8f0ff;
+    background: rgba(0, 0, 0, 0.45); border: 1px solid var(--line);
+  }
+  .editor textarea:focus-visible, .editor input:focus-visible { outline: none; border-color: var(--holo); box-shadow: 0 0 0 3px rgba(116, 230, 255, 0.2); }
+  .editor .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .editor label { display: flex; flex-direction: column; gap: 6px; font: 600 0.66rem/1 'Oxanium', sans-serif; letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); }
+  .editor input { padding: 10px; border-radius: 6px; font: 500 0.95rem 'Chakra Petch', sans-serif; color: #fff; background: rgba(0, 0, 0, 0.45); border: 1px solid var(--line); }
+  .editor .actions { display: flex; flex-wrap: wrap; gap: 10px; }
+  .btn-primary {
+    display: inline-flex; align-items: center; gap: 8px; padding: 11px 16px; border-radius: 6px; cursor: pointer;
+    font: 700 0.74rem/1 'Oxanium', sans-serif; letter-spacing: 0.16em; text-transform: uppercase;
+    color: #03140a; background: var(--kyber); border: 1px solid var(--kyber); box-shadow: 0 6px 24px -8px rgba(141, 255, 178, 0.7);
+    transition: scale 160ms var(--ease-out), filter 200ms ease;
+  }
+  .btn-primary:active { scale: 0.97; }
+  .btn-primary:disabled { opacity: 0.6; cursor: progress; }
+  @media (hover: hover) and (pointer: fine) { .btn-primary:hover { filter: brightness(1.08); } }
+  .status { min-height: 1.4em; font-size: 0.88rem; }
+  .status.is-error { color: #ff8a8a; }
+  .status.is-ok { color: var(--kyber); }
+
+  /* ── Responsive ── */
+  @media (max-width: 900px) {
+    .nav { display: none; }
+    .brand span { display: none; }
+    .plan-grid { display: block; }
+    .plan-hud { position: sticky; top: calc(var(--hud-h) + 8px); height: auto; z-index: 4; }
+    .plan-hud-box { max-width: none; padding: 10px 14px; display: flex; align-items: center; gap: 16px; background: rgba(5, 9, 19, 0.88); }
+    .phase-counter { margin: 0; }
+    .phase-counter .now { font-size: 1.6rem; }
+    .phase-counter .lbl { display: none; }
+    .lanes { grid-auto-flow: column; overflow-x: auto; gap: 14px; scrollbar-width: none; }
+    .lane { grid-template-columns: 10px auto; white-space: nowrap; font-size: 0.82rem; }
+    .lane em { display: none; }
+    .phases { gap: 10vh; padding-top: 4vh; }
+    .phase { opacity: 1; }
+    .scroll-cue { display: none; }
+  }
+  @media (max-width: 560px) {
+    .hud-btn .lbl { display: none; }
+    .hud-btn { padding: 9px; }
+    .grid { grid-template-columns: 1fr; }
+    .editor .row { grid-template-columns: 1fr; }
+  }
+
+  /* ── Reduced motion: no travel, no scan, no stagger; states stay legible ── */
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .js .phase.will-scan, .js .phase.is-scanned { clip-path: none; }
+    .phase.is-scanned::after { animation: none; }
+    .js .grid.will-deal .card, .js .grid.is-dealt .card { opacity: 1; transform: none; transition: none; }
+    .gate-ring { animation-duration: 2.4s; }
+    .editor, .editor.is-open { transition: visibility 0s; }
+    .nav-ink { transition: opacity 200ms ease; }
+  }
+</style>
+</head>
+<body>
+<canvas id="scene" aria-hidden="true"></canvas>
+<div class="fx fx-vignette" aria-hidden="true"></div>
+<div class="fx fx-scan" aria-hidden="true"></div>
+
+<header class="hud">
+  <a class="brand" href="#top" data-scroll>
+    <img src="images/icon-kinderkarten.svg" alt="">
+    <b>Kinderkarten</b><span>War Room</span>
+  </a>
+  <nav class="nav" aria-label="Sections" data-nav>
+    <span class="nav-ink" aria-hidden="true"></span>
+  </nav>
+  <div class="hud-actions">
+    <button class="hud-btn" type="button" data-action="edit" aria-controls="editor" aria-expanded="false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16v4z"/><path d="M13.5 6.5l4 4"/></svg>
+      <span class="lbl">Edit</span>
+    </button>
+    <button class="hud-btn" type="button" data-action="lock" aria-label="Lock and leave">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7.5a4 4 0 0 1 8 0V11"/></svg>
+      <span class="lbl">Lock</span>
+    </button>
+    <a class="hud-btn" href="index.html#/kinderkarten" aria-label="Back to the Kinderkarten page">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>
+      <span class="lbl">Exit</span>
+    </a>
+  </div>
+</header>
+
+<div class="gate" id="gate" role="status" aria-live="polite">
+  <div>
+    <div class="gate-ring" aria-hidden="true"></div>
+    <p data-gate-title>Decrypting transmission</p>
+    <p class="gate-sub" data-gate-sub>Kinderkarten members only</p>
+  </div>
+</div>
+
+<main id="main" hidden></main>
+
+<aside class="editor" id="editor" aria-labelledby="editor-title" aria-hidden="true">
+  <h2 id="editor-title">Edit the War Room</h2>
+  <p>Markdown. Changes preview live on this page. Nothing is published from here: download the encrypted file, then replace <code>kinderkarten-members.data.js</code> on GitHub and Netlify.</p>
+  <textarea id="editor-source" spellcheck="false" aria-label="Content (Markdown)"></textarea>
+  <div class="row">
+    <label>New password (optional)<input id="editor-new1" type="password" autocomplete="new-password"></label>
+    <label>Confirm new password<input id="editor-new2" type="password" autocomplete="new-password"></label>
+  </div>
+  <div class="actions">
+    <button class="btn-primary" type="button" id="editor-download">Download encrypted file</button>
+    <button class="hud-btn" type="button" id="editor-close">Close</button>
+  </div>
+  <p class="status" id="editor-status" role="status"></p>
+</aside>
+
+<script src="vendor/marked.min.js"></script>
+<script src="vendor/three.min.js"></script>
+<script src="kinderkarten-members.data.js"></script>
+<script>
+(function () {
+  'use strict';
+  const STORE = 'nk-kk-members-key';
+  const WARP_FLAG = 'nk-kk-warp';
+  const ITERATIONS = 600000;
+  const LOCK_URL = 'index.html#/kinderkarten-members';
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)');
+  const $ = s => document.querySelector(s);
+  const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+  /* ───────── Crypto ───────── */
+  const toB64 = bytes => { let s = ''; const b = new Uint8Array(bytes); for (let i = 0; i < b.length; i += 0x8000) s += String.fromCharCode.apply(null, b.subarray(i, i + 0x8000)); return btoa(s); };
+  const fromB64 = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
+  const store = () => { try { return { s: sessionStorage, l: localStorage }; } catch (e) { return null; } };
+  async function storedKey() {
+    const st = store(); if (!st || !window.NK_KK_MEMBERS) return null;
+    const raw = st.s.getItem(STORE) || st.l.getItem(STORE); if (!raw) return null;
+    try {
+      const v = JSON.parse(raw);
+      if (v.salt !== window.NK_KK_MEMBERS.salt) return null;
+      return await crypto.subtle.importKey('raw', fromB64(v.key), { name: 'AES-GCM' }, true, ['encrypt', 'decrypt']);
+    } catch (e) { return null; }
+  }
+  async function saveKey(k) {
+    const st = store(); if (!st) return;
+    const v = JSON.stringify({ salt: window.NK_KK_MEMBERS.salt, key: toB64(await crypto.subtle.exportKey('raw', k)) });
+    st.s.setItem(STORE, v);
+    if (st.l.getItem(STORE)) st.l.setItem(STORE, v);
+  }
+  function forgetKey() { const st = store(); if (st) { st.s.removeItem(STORE); st.l.removeItem(STORE); } }
+  async function deriveKey(password, salt) {
+    const base = await crypto.subtle.importKey('raw', new TextEncoder().encode(password.normalize('NFC')), 'PBKDF2', false, ['deriveKey']);
+    return crypto.subtle.deriveKey({ name: 'PBKDF2', hash: 'SHA-256', salt, iterations: ITERATIONS }, base, { name: 'AES-GCM', length: 256 }, true, ['encrypt', 'decrypt']);
+  }
+
+  /* ───────── Parsing the Markdown into the War Room ───────── */
+  const LANES = [
+    { id: 'ls', label: 'Light side', color: '#5cb8ff', re: /\b(LS\d?|Kafrene)\b/i },
+    { id: 'mx', label: 'Mixed', color: '#ffb547', re: /\b(MX\d?|Vandor)\b/i },
+    { id: 'ds', label: 'Dark side', color: '#ff4d5e', re: /\b(DS\d?|Malachor)\b/i },
+    { id: 'zeffo', label: 'Zeffo', color: '#b48cff', re: /Zeffo/i },
+    { id: 'mando', label: 'Mandalore', color: '#6af0d0', re: /Mandalore/i },
+  ];
+  const STATE_LABEL = { stars: 'Stars', preload: 'Preload', cms: 'CMs only', avoid: 'Do not touch', go: 'Active', off: '—' };
+  function classifySegment(seg) {
+    let lane = null, best = Infinity;
+    for (const l of LANES) { const m = seg.match(l.re); if (m && m.index < best) { best = m.index; lane = l; } }
+    let state = 'go';
+    if (/no touchy|don'?t|skip|avoid/i.test(seg)) state = 'avoid';
+    else if (/preload/i.test(seg)) state = 'preload';
+    else if (/CMs?\b/i.test(seg) && !/⭐|★|\bstars?\b/i.test(seg)) state = 'cms';
+    else if (/⭐|★|\bstars?\b|all in/i.test(seg)) state = 'stars';
+    const stars = (seg.match(/(\d)\s*(?:⭐|★)/) || [])[1];
+    return { lane, state, stars: stars ? +stars : (state === 'stars' ? 3 : 0), text: seg.trim() };
+  }
+  function phaseLanes(targetText) {
+    const lanes = {};
+    if (/\ball\b/i.test(targetText) && !/~/.test(targetText)) {
+      const stars = +((targetText.match(/(\d)\s*(?:⭐|★)/) || [])[1] || 9);
+      ['ls', 'mx', 'ds'].forEach(id => { lanes[id] = { state: 'stars', stars: Math.min(3, Math.round(stars / 3)) || 3 }; });
+      return { lanes, chips: [{ lane: null, state: 'stars', text: targetText.trim() }] };
+    }
+    const chips = targetText.split('~').map(classifySegment).filter(c => c.text);
+    chips.forEach(c => { if (c.lane && !lanes[c.lane.id]) lanes[c.lane.id] = { state: c.state, stars: c.stars }; });
+    return { lanes, chips };
+  }
+  const UNIT_RE = /^(.*?)\b([RT])(\d{1,2})\s+(.+)$/;
+  function parseUnits(text) {
+    return text.split(/\s*,\s*/).map(s => s.trim()).filter(Boolean).map(s => {
+      const m = s.match(UNIT_RE);
+      if (!m) return { note: '', tier: '', level: '', name: s };
+      return { note: m[1].trim(), tier: m[2].toUpperCase(), level: m[3], name: m[4].trim() };
+    });
+  }
+
+  function build(md) {
+    const tmp = document.createElement('div');
+    tmp.innerHTML = window.marked.parse(md, { gfm: true, breaks: true });
+    const nodes = [...tmp.childNodes].filter(n => n.nodeType === 1);
+    let title = 'War Room', subtitle = '', objective = '';
+    const sections = [];
+    let cur = null;
+    for (const n of nodes) {
+      if (n.tagName === 'H1' && !cur) { title = n.textContent.trim(); continue; }
+      if (n.tagName === 'BLOCKQUOTE' && !cur && !subtitle) { subtitle = n.innerHTML; continue; }
+      if (n.tagName === 'H2') { cur = { title: n.textContent.trim(), nodes: [] }; sections.push(cur); continue; }
+      if (cur) cur.nodes.push(n);
+    }
+    const objMatch = tmp.textContent.match(/Objective\s*:?\s*(\d+\+?)/i);
+    objective = objMatch ? objMatch[1] : '';
+    return { title, subtitle, objective, sections };
+  }
+
+  function linkify(container) {
+    container.querySelectorAll('a[href]').forEach(a => {
+      const href = a.getAttribute('href');
+      if (/^https?:/i.test(href)) { a.target = '_blank'; a.rel = 'noopener'; }
+      if (/discord(app)?\.com\/channels/i.test(href)) {
+        a.classList.add('mission');
+        a.insertAdjacentHTML('afterbegin', '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.3 4.4A19.3 19.3 0 0015 2.9a13 13 0 00-.6 1.2 17.9 17.9 0 00-5.3 0A12.7 12.7 0 008.5 2.9a19.4 19.4 0 00-5.3 1.5C.5 8.7-.3 12.9.1 17c2 1.5 4 2.4 5.9 3a14 14 0 001.2-2 12.6 12.6 0 01-2-.9l.5-.4a13.8 13.8 0 0011.8 0l.5.4a12.6 12.6 0 01-2 1 14 14 0 001.2 2c1.9-.6 3.9-1.5 5.9-3 .5-4.8-.8-9-3.8-12.7zM8 14.4c-1.2 0-2.1-1-2.1-2.3s.9-2.3 2.1-2.3 2.1 1 2.1 2.3-.9 2.3-2.1 2.3zm7.9 0c-1.2 0-2.1-1-2.1-2.3s.9-2.3 2.1-2.3 2.1 1 2.1 2.3-.9 2.3-2.1 2.3z"/></svg>');
+      }
+    });
+  }
+  const slug = t => t.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'section';
+  const STAR_SVG = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 1.8l2.9 6.7 7.3.6-5.5 4.8 1.7 7.1L12 17.3 5.6 21l1.7-7.1L1.8 9.1l7.3-.6z"/></svg>';
+
+  let phaseData = [];
+  function render(md) {
+    const doc = build(md);
+    const main = $('#main');
+    const parts = [];
+    let rosterStats = null;
+    phaseData = [];
+
+    // Hero
+    const titleChars = doc.title.split(/\s+/).map(w => `<span class="word">${[...w].map(ch => `<span class="ch">${esc(ch)}</span>`).join('')}</span>`).join(' ');
+    parts.push(`<section class="hero" id="top" data-scene="hero"><div class="wrap hero-inner-wrap"><div class="hero-inner">
+      <h1 class="hero-title" aria-label="${esc(doc.title)}"><span aria-hidden="true">${titleChars}</span></h1>
+      ${doc.subtitle ? `<div class="hero-by">${doc.subtitle.replace(/<\/?p>/g, '').replace(/\s*[·|,-]?\s*Objective\s*:?[^<]*$/i, '')}</div>` : ''}
+      <div class="hero-stats" data-hero-stats></div>
+    </div></div>
+    <a class="scroll-cue" href="#${slug((doc.sections[0] || {}).title || 'top')}" data-scroll>Scroll</a></section>`);
+
+    const nav = [];
+    doc.sections.forEach(sec => {
+      const id = slug(sec.title);
+      nav.push({ id, title: sec.title });
+      const isPlan = /\b(tb|plan|territory)\b/i.test(sec.title);
+      const isRoster = /platoon|roster|peloton/i.test(sec.title);
+      const glyph = esc(sec.title);
+      if (isPlan) {
+        // split into phases by h3
+        const phases = []; let p = null; const intro = [];
+        sec.nodes.forEach(n => {
+          if (n.tagName === 'H3') { p = { title: n.textContent.trim(), nodes: [] }; phases.push(p); }
+          else if (p) p.nodes.push(n); else intro.push(n);
+        });
+        const phaseHtml = phases.map((ph, i) => {
+          let targets = null;
+          const first = ph.nodes[0];
+          if (first && first.tagName === 'P' && first.querySelector('strong') && first.textContent.trim() === first.querySelector('strong').textContent.trim()) {
+            targets = phaseLanes(first.textContent); ph.nodes.shift();
+          }
+          phaseData.push(targets ? targets.lanes : {});
+          const chips = targets ? `<ul class="targets" aria-label="Targets">${targets.chips.map(c => {
+            const color = c.lane ? c.lane.color : '#ffd75e';
+            return `<li class="target" data-state="${c.state}" style="--c:${color}">${esc(c.text)}</li>`;
+          }).join('')}</ul>` : '';
+          const body = document.createElement('div'); ph.nodes.forEach(n => body.appendChild(n.cloneNode(true)));
+          linkify(body);
+          const num = String(i + 1).padStart(2, '0');
+          return `<article class="phase will-scan" data-phase="${i}" aria-labelledby="ph-${i}">
+            <span class="phase-index" aria-hidden="true">${num}</span>
+            <h3 id="ph-${i}">${esc(ph.title)}</h3>${chips}<div class="md">${body.innerHTML}</div></article>`;
+        }).join('');
+        const introDiv = document.createElement('div'); intro.forEach(n => introDiv.appendChild(n.cloneNode(true))); linkify(introDiv);
+        const lanesHtml = LANES.map(l => `<li class="lane" data-lane="${l.id}" data-state="off" style="--c:${l.color}"><i></i><span>${l.label}</span><em>—</em></li>`).join('');
+        parts.push(`<section class="plan" id="${id}" data-scene="plan"><div class="wrap">
+          <div class="sec-head"><div><h2 class="sec-title">${esc(sec.title)}</h2><span class="sec-glyph" aria-hidden="true">${glyph}</span></div>
+          ${introDiv.innerHTML.trim() ? `<div class="sec-note md">${introDiv.innerHTML}</div>` : ''}</div>
+          <div class="plan-grid">
+            <div class="plan-hud"><div class="plan-hud-box">
+              <div class="phase-counter"><span class="now" data-phase-now>01</span><span class="of">/ ${String(phases.length).padStart(2, '0')}</span><span class="lbl">Phase</span></div>
+              <ul class="lanes" aria-label="Sectors this phase">${lanesHtml}</ul>
+            </div></div>
+            <div class="phases">${phaseHtml}</div>
+          </div></div></section>`);
+      } else if (isRoster) {
+        const list = sec.nodes.find(n => n.tagName === 'OL' || n.tagName === 'UL');
+        const others = sec.nodes.filter(n => n !== list);
+        const players = list ? [...list.children].map((li, i) => {
+          const strong = li.querySelector('strong');
+          const name = strong ? strong.textContent.trim() : li.textContent.split(/[—:-]/)[0].trim();
+          let rest = li.textContent;
+          if (strong) rest = rest.slice(rest.indexOf(strong.textContent) + strong.textContent.length);
+          rest = rest.replace(/^\s*[—–:-]\s*/, '').trim();
+          const start = list.tagName === 'OL' ? (+list.getAttribute('start') || 1) : 1;
+          return { n: start + i, name, units: rest ? parseUnits(rest) : [] };
+        }) : [];
+        const allUnits = players.flatMap(p => p.units);
+        rosterStats = { players: players.length, units: allUnits.length, r9: allUnits.filter(u => u.level === '9').length };
+        const cards = players.map(p => {
+          const units = p.units.length
+            ? `<ul class="units">${p.units.map(u => `<li class="unit">${u.level ? `<span class="relic" data-r="${u.level}" data-t="${u.tier}" title="${u.tier === 'T' ? 'Tier' : 'Relic'} ${u.level}">${u.tier}${u.level}</span>` : ''}<span class="u-name">${esc(u.name)}</span>${u.note ? `<span class="note">${esc(u.note)}</span>` : ''}</li>`).join('')}</ul>`
+            : '<p class="empty-note">No platoon assignment</p>';
+          const search = (p.name + ' ' + p.units.map(u => u.name + ' ' + u.note).join(' ')).toLowerCase();
+          return `<article class="card${p.units.length ? '' : ' is-empty'}" data-search="${esc(search)}">
+            <div class="card-head"><span class="card-num">#${String(p.n).padStart(2, '0')}</span><h3 class="card-name">${esc(p.name)}</h3>${p.units.length ? `<span class="card-count">${p.units.length} unit${p.units.length > 1 ? 's' : ''}</span>` : ''}</div>
+            ${units}</article>`;
+        }).join('');
+        const otherDiv = document.createElement('div'); others.forEach(n => otherDiv.appendChild(n.cloneNode(true))); linkify(otherDiv);
+        parts.push(`<section class="roster" id="${id}" data-scene="roster"><div class="wrap">
+          <div class="sec-head"><div><h2 class="sec-title">${esc(sec.title)}</h2><span class="sec-glyph" aria-hidden="true">${glyph}</span></div>
+          ${otherDiv.innerHTML.trim() ? `<div class="sec-note md">${otherDiv.innerHTML}</div>` : ''}</div>
+          <div class="roster-stats">
+            <div class="stat"><span class="stat-value" data-count="${rosterStats.players}">${rosterStats.players}</span><span class="stat-label">Players</span></div>
+            <div class="stat"><span class="stat-value" data-count="${rosterStats.units}">${rosterStats.units}</span><span class="stat-label">Units assigned</span></div>
+            <div class="stat"><span class="stat-value" data-count="${rosterStats.r9}">${rosterStats.r9}</span><span class="stat-label">Relic 9 units</span></div>
+          </div>
+          <div class="roster-tools">
+            <label class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
+              <input type="search" placeholder="Find a player or a unit" aria-label="Find a player or a unit" data-search-input autocomplete="off"></label>
+            <ul class="legend" aria-label="Relic levels"><li><span class="relic" data-r="9">R9</span></li><li><span class="relic" data-r="8">R8</span></li><li><span class="relic" data-r="7">R7</span></li><li><span class="relic" data-r="6">R6</span></li></ul>
+            <span class="result-count" data-result-count aria-live="polite">${players.length} players</span>
+          </div>
+          <div class="grid will-deal" data-grid>${cards}</div>
+          <p class="no-results" data-no-results hidden>No player or unit matches this search.</p>
+        </div></section>`);
+      } else {
+        const body = document.createElement('div'); sec.nodes.forEach(n => body.appendChild(n.cloneNode(true))); linkify(body);
+        parts.push(`<section class="guides" id="${id}" data-scene="guides"><div class="wrap">
+          <div class="sec-head"><div><h2 class="sec-title">${esc(sec.title)}</h2><span class="sec-glyph" aria-hidden="true">${glyph}</span></div></div>
+          <div class="guides-body md">${body.innerHTML}</div></div></section>`);
+      }
+    });
+    parts.push(`<footer class="foot"><p class="glyph" aria-hidden="true">the smallest seed the tallest tree</p><p>The smallest seed, the tallest tree</p></footer>`);
+    main.innerHTML = parts.join('');
+
+    // hero stats
+    const plan = phaseData.length;
+    const statHtml = [];
+    if (doc.objective) statHtml.push(`<div class="stat is-main"><span class="stat-value">${STAR_SVG}<span data-count="${parseInt(doc.objective, 10)}" data-suffix="${doc.objective.replace(/^\d+/, '')}">${esc(doc.objective)}</span></span><span class="stat-label">Objective</span></div>`);
+    if (plan) statHtml.push(`<div class="stat"><span class="stat-value" data-count="${plan}">${plan}</span><span class="stat-label">Phases</span></div>`);
+    if (rosterStats) statHtml.push(`<div class="stat"><span class="stat-value" data-count="${rosterStats.players}">${rosterStats.players}</span><span class="stat-label">Players in platoons</span></div>`);
+    main.querySelector('[data-hero-stats]').innerHTML = statHtml.join('');
+
+    // nav
+    const navEl = $('[data-nav]');
+    navEl.querySelectorAll('a').forEach(a => a.remove());
+    nav.forEach(n => navEl.insertAdjacentHTML('beforeend', `<a href="#${n.id}" data-scroll>${esc(n.title)}</a>`));
+    return doc;
+  }
+
+  /* ───────── Interactions ───────── */
+  let io = [];
+  function wire(first) {
+    io.forEach(o => o.disconnect()); io = [];
+    const main = $('#main');
+    const reduce = reduceMotion.matches;
+
+    // Title decode: Aurebesh glyphs resolve into letters (first arrival only)
+    const chars = [...main.querySelectorAll('.hero-title .ch')];
+    if (first && !reduce) {
+      chars.forEach(c => c.classList.add('is-glyph'));
+      chars.forEach((c, i) => setTimeout(() => c.classList.remove('is-glyph'), 650 + i * 55 + Math.random() * 120));
+    }
+
+    // Count-ups (once each, when visible)
+    const counters = [...main.querySelectorAll('[data-count]')];
+    const countUp = el => {
+      const to = +el.dataset.count, suffix = el.dataset.suffix || '';
+      if (reduce || !to) { el.textContent = to + suffix; return; }
+      const t0 = performance.now(), dur = 1100;
+      const step = t => { const k = Math.min(1, (t - t0) / dur); const e = 1 - Math.pow(1 - k, 4); el.textContent = Math.round(to * e) + (k === 1 ? suffix : ''); if (k < 1) requestAnimationFrame(step); };
+      requestAnimationFrame(step);
+    };
+    const cio = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { countUp(e.target); cio.unobserve(e.target); } }), { threshold: 0.6 });
+    counters.forEach(c => { if (first) { c.textContent = '0'; cio.observe(c); } });
+    io.push(cio);
+
+    // Phase panels: scan in once; the one nearest the viewport centre drives the holotable
+    const phases = [...main.querySelectorAll('.phase')];
+    const sio = new IntersectionObserver(es => es.forEach(e => {
+      if (!e.isIntersecting) return;
+      e.target.style.setProperty('--h', e.target.offsetHeight + 'px');
+      e.target.classList.add('is-scanned'); e.target.classList.remove('will-scan'); sio.unobserve(e.target);
+    }), { rootMargin: '0px 0px -12% 0px' });
+    phases.forEach(p => reduce ? p.classList.remove('will-scan') : sio.observe(p));
+    io.push(sio);
+
+    // Roster: cards are dealt in once, row by row
+    const grid = main.querySelector('[data-grid]');
+    if (grid) {
+      if (reduce) grid.classList.remove('will-deal');
+      else {
+        const gio = new IntersectionObserver(es => {
+          if (!es.some(e => e.isIntersecting)) return;
+          const cols = getComputedStyle(grid).gridTemplateColumns.split(' ').length;
+          [...grid.children].forEach((c, i) => c.style.setProperty('--d', Math.min(Math.floor(i / cols) * 70 + (i % cols) * 35, 600) + 'ms'));
+          grid.classList.add('is-dealt'); grid.classList.remove('will-deal'); gio.disconnect();
+        }, { rootMargin: '0px 0px -10% 0px' });
+        gio.observe(grid); io.push(gio);
+      }
+      // pointer light on cards
+      grid.addEventListener('pointermove', e => {
+        if (!finePointer.matches) return;
+        const card = e.target.closest('.card'); if (!card) return;
+        const r = card.getBoundingClientRect();
+        card.style.setProperty('--px', (e.clientX - r.left) + 'px'); card.style.setProperty('--py', (e.clientY - r.top) + 'px');
+      });
+      // search
+      const input = main.querySelector('[data-search-input]');
+      const count = main.querySelector('[data-result-count]');
+      const none = main.querySelector('[data-no-results]');
+      const cards = [...grid.children];
+      cards.forEach(c => { c._html = c.innerHTML; });
+      const run = () => {
+        const q = input.value.trim().toLowerCase();
+        let shown = 0;
+        cards.forEach(c => {
+          const hit = !q || c.dataset.search.includes(q);
+          c.hidden = !hit; if (hit) shown++;
+          c.innerHTML = c._html;
+          if (q && hit) {
+            const walker = document.createTreeWalker(c, NodeFilter.SHOW_TEXT);
+            const texts = []; while (walker.nextNode()) texts.push(walker.currentNode);
+            texts.forEach(t => {
+              const i = t.data.toLowerCase().indexOf(q); if (i < 0 || t.parentNode.closest('.relic, .card-num, .card-count')) return;
+              const mark = document.createElement('mark'); const after = t.splitText(i); after.splitText(q.length);
+              mark.textContent = after.data; after.replaceWith(mark);
+            });
+          }
+        });
+        count.textContent = q ? `${shown} / ${cards.length}` : `${cards.length} players`;
+        none.hidden = shown > 0;
+      };
+      input.addEventListener('input', run);
+      input.addEventListener('keydown', e => { if (e.key === 'Escape') { input.value = ''; run(); } });
+    }
+
+    // In-page navigation
+    document.querySelectorAll('[data-scroll]').forEach(a => {
+      if (a._wired) return; a._wired = true;
+      a.addEventListener('click', e => {
+        const t = document.querySelector(a.getAttribute('href')); if (!t) return;
+        e.preventDefault(); t.scrollIntoView({ behavior: reduceMotion.matches ? 'auto' : 'smooth', block: 'start' });
+      });
+    });
+  }
+
+  /* Active section, nav ink, active phase (one rAF-throttled scroll reader) */
+  let ticking = false;
+  function onScroll() {
+    if (ticking) return; ticking = true;
+    requestAnimationFrame(() => {
+      ticking = false;
+      const vh = innerHeight, mid = vh * 0.5;
+      document.documentElement.classList.toggle('scrolled', scrollY > 40);
+      // sections
+      const secs = [...document.querySelectorAll('main > section')];
+      let active = secs[0];
+      secs.forEach(s => { if (s.getBoundingClientRect().top <= mid) active = s; });
+      const navLinks = [...document.querySelectorAll('[data-nav] a')];
+      const ink = document.querySelector('.nav-ink');
+      let cur = null;
+      navLinks.forEach(a => { const on = active && a.getAttribute('href') === '#' + active.id; a.setAttribute('aria-current', on ? 'true' : 'false'); if (on) cur = a; });
+      if (ink) {
+        if (cur) { ink.style.opacity = 1; ink.style.transform = `translateX(${cur.offsetLeft + 12}px) scaleX(${cur.offsetWidth - 24})`; }
+        else ink.style.opacity = 0;
+      }
+      // phases
+      const phases = [...document.querySelectorAll('.phase')];
+      let best = null, bd = Infinity;
+      phases.forEach(p => { const r = p.getBoundingClientRect(); const d = Math.abs(r.top + r.height / 2 - mid); if (d < bd) { bd = d; best = p; } });
+      phases.forEach(p => p.classList.toggle('is-active', p === best));
+      const idx = best ? +best.dataset.phase : 0;
+      if (idx !== currentPhase) setPhase(idx);
+      // scroll progress for the 3D scene
+      scene && scene.setScroll(sceneProgress());
+    });
+  }
+  let currentPhase = -1;
+  function setPhase(i) {
+    currentPhase = i;
+    const lanes = phaseData[i] || {};
+    const now = document.querySelector('[data-phase-now]'); if (now) now.textContent = String(i + 1).padStart(2, '0');
+    document.querySelectorAll('.lane').forEach(li => {
+      const st = lanes[li.dataset.lane];
+      li.dataset.state = st ? st.state : 'off';
+      li.querySelector('em').textContent = st ? (st.state === 'stars' && st.stars ? `${st.stars} ★` : STATE_LABEL[st.state]) : '—';
+    });
+    scene && scene.setLanes(lanes);
+  }
+  // 0 → hero, 1 → plan, 2 → roster, 3 → guides (continuous)
+  function sceneProgress() {
+    const ids = ['hero', 'plan', 'roster', 'guides'];
+    const secs = ids.map(k => document.querySelector(`[data-scene="${k}"]`));
+    const y = scrollY + innerHeight * 0.5;
+    let p = 0;
+    for (let i = 0; i < secs.length; i++) {
+      const s = secs[i]; if (!s) continue;
+      const top = s.offsetTop, h = s.offsetHeight;
+      if (y >= top) p = i + Math.min(1, (y - top) / Math.max(1, h)) * 0.999;
+    }
+    return p;
+  }
+
+  /* ───────── 3D scene (Three.js) ───────── */
+  let scene = null;
+  function makeScene() {
+    if (!window.THREE) return null;
+    const THREE = window.THREE;
+    const canvas = $('#scene');
+    let renderer;
+    try { renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'high-performance' }); }
+    catch (e) { return null; }
+    const small = Math.min(innerWidth, innerHeight) < 700;
+    renderer.setPixelRatio(Math.min(devicePixelRatio || 1, small ? 1.5 : 1.75));
+    renderer.setClearColor(0x000000, 0);
+    const world = new THREE.Scene();
+    world.fog = new THREE.FogExp2(0x03050b, 0.018);
+    const camera = new THREE.PerspectiveCamera(45, innerWidth / innerHeight, 0.1, 400);
+    camera.position.set(0, 3, 16);
+
+    // glow sprite texture
+    const gc = document.createElement('canvas'); gc.width = gc.height = 64;
+    const g = gc.getContext('2d'); const grd = g.createRadialGradient(32, 32, 0, 32, 32, 32);
+    grd.addColorStop(0, 'rgba(255,255,255,1)'); grd.addColorStop(0.25, 'rgba(255,255,255,0.55)'); grd.addColorStop(1, 'rgba(255,255,255,0)');
+    g.fillStyle = grd; g.fillRect(0, 0, 64, 64);
+    const glowTex = new THREE.CanvasTexture(gc);
+
+    const fresnel = (color, power, intensity, base) => new THREE.ShaderMaterial({
+      uniforms: { uColor: { value: new THREE.Color(color) }, uPower: { value: power }, uIntensity: { value: intensity }, uBase: { value: base || 0.04 } },
+      vertexShader: 'varying vec3 vN; varying vec3 vV; void main(){ vec4 mv = modelViewMatrix * vec4(position,1.0); vN = normalize(normalMatrix * normal); vV = normalize(-mv.xyz); gl_Position = projectionMatrix * mv; }',
+      fragmentShader: 'uniform vec3 uColor; uniform float uPower; uniform float uIntensity; uniform float uBase; varying vec3 vN; varying vec3 vV; void main(){ float f = pow(1.0 - max(dot(vN, vV), 0.0), uPower); float a = f * uIntensity + uBase; gl_FragColor = vec4(uColor * a, a); }',
+      transparent: true, blending: THREE.AdditiveBlending, depthWrite: false,
+    });
+
+    // Stars + hyperspace streaks
+    const STAR_N = small ? 1400 : 2600;
+    const starPos = new Float32Array(STAR_N * 3);
+    for (let i = 0; i < STAR_N; i++) {
+      starPos[i * 3] = (Math.random() - 0.5) * 220; starPos[i * 3 + 1] = (Math.random() - 0.5) * 140; starPos[i * 3 + 2] = -Math.random() * 200 + 40;
+    }
+    const starGeo = new THREE.BufferGeometry(); starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
+    const starMat = new THREE.PointsMaterial({ size: 0.45, map: glowTex, color: 0xcfe6ff, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, opacity: 0.9, sizeAttenuation: true });
+    const stars = new THREE.Points(starGeo, starMat); world.add(stars);
+
+    const STREAK_N = small ? 500 : 900;
+    const sp = new Float32Array(STREAK_N * 6), tail = new Float32Array(STREAK_N * 2);
+    for (let i = 0; i < STREAK_N; i++) {
+      const a = Math.random() * Math.PI * 2, r = 4 + Math.random() * 60, z = -Math.random() * 160;
+      const x = Math.cos(a) * r, y = Math.sin(a) * r;
+      sp.set([x, y, z, x, y, z], i * 6); tail[i * 2] = 0; tail[i * 2 + 1] = 1;
+    }
+    const streakGeo = new THREE.BufferGeometry();
+    streakGeo.setAttribute('position', new THREE.BufferAttribute(sp, 3)); streakGeo.setAttribute('aTail', new THREE.BufferAttribute(tail, 1));
+    const streakMat = new THREE.ShaderMaterial({
+      uniforms: { uStretch: { value: 0 }, uAlpha: { value: 0 } },
+      vertexShader: 'attribute float aTail; uniform float uStretch; varying float vT; void main(){ vec3 p = position; p.z += aTail * uStretch; vT = aTail; gl_Position = projectionMatrix * modelViewMatrix * vec4(p,1.0); }',
+      fragmentShader: 'uniform float uAlpha; varying float vT; void main(){ gl_FragColor = vec4(mix(vec3(0.8,0.95,1.0), vec3(0.3,0.7,1.0), vT) * uAlpha, uAlpha * (1.0 - vT * 0.7)); }',
+      transparent: true, blending: THREE.AdditiveBlending, depthWrite: false,
+    });
+    const streaks = new THREE.LineSegments(streakGeo, streakMat); streaks.visible = false; world.add(streaks);
+
+    // Holotable
+    const table = new THREE.Group(); world.add(table);
+    const gridMat = new THREE.LineBasicMaterial({ color: 0x74e6ff, transparent: true, opacity: 0.22, blending: THREE.AdditiveBlending, depthWrite: false });
+    for (let r = 1; r <= 6; r++) {
+      const pts = []; for (let k = 0; k <= 128; k++) { const a = k / 128 * Math.PI * 2; pts.push(new THREE.Vector3(Math.cos(a) * r * 1.05, 0, Math.sin(a) * r * 1.05)); }
+      const loop = new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), gridMat.clone()); loop.material.opacity = r === 6 ? 0.45 : 0.14; table.add(loop);
+    }
+    const radial = []; for (let k = 0; k < 24; k++) { const a = k / 24 * Math.PI * 2; radial.push(new THREE.Vector3(Math.cos(a) * 1.05, 0, Math.sin(a) * 1.05), new THREE.Vector3(Math.cos(a) * 6.3, 0, Math.sin(a) * 6.3)); }
+    table.add(new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(radial), new THREE.LineBasicMaterial({ color: 0x74e6ff, transparent: true, opacity: 0.08, blending: THREE.AdditiveBlending, depthWrite: false })));
+    table.position.y = -1.6;
+    // projection beam
+    const beamMat = new THREE.ShaderMaterial({
+      uniforms: { uColor: { value: new THREE.Color(0x74e6ff) }, uAlpha: { value: 0.16 } },
+      vertexShader: 'varying float vY; void main(){ vY = uv.y; gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }',
+      fragmentShader: 'uniform vec3 uColor; uniform float uAlpha; varying float vY; void main(){ float a = uAlpha * pow(1.0 - vY, 2.2); gl_FragColor = vec4(uColor * a, a); }',
+      transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide,
+    });
+    const beam = new THREE.Mesh(new THREE.CylinderGeometry(6.4, 6.6, 5.2, 64, 1, true), beamMat); beam.position.y = 2.6; table.add(beam);
+    // holographic motes
+    const MOTE_N = small ? 160 : 320;
+    const mp = new Float32Array(MOTE_N * 3); const mseed = new Float32Array(MOTE_N);
+    for (let i = 0; i < MOTE_N; i++) { const a = Math.random() * Math.PI * 2, r = Math.sqrt(Math.random()) * 6; mp.set([Math.cos(a) * r, Math.random() * 5, Math.sin(a) * r], i * 3); mseed[i] = Math.random(); }
+    const moteGeo = new THREE.BufferGeometry(); moteGeo.setAttribute('position', new THREE.BufferAttribute(mp, 3));
+    const motes = new THREE.Points(moteGeo, new THREE.PointsMaterial({ size: 0.12, map: glowTex, color: 0x9ff0ff, transparent: true, opacity: 0.7, blending: THREE.AdditiveBlending, depthWrite: false }));
+    table.add(motes);
+
+    // Planets (sectors)
+    const SECTORS = {
+      ls: { color: 0x5cb8ff, pos: [-3.3, 1.2, 0.6], r: 1.05 },
+      mx: { color: 0xffb547, pos: [0, 1.5, -2.4], r: 1.05 },
+      ds: { color: 0xff4d5e, pos: [3.3, 1.2, 0.6], r: 1.05 },
+      zeffo: { color: 0xb48cff, pos: [-1.5, 0.8, 3.0], r: 0.6 },
+      mando: { color: 0x6af0d0, pos: [1.5, 0.8, 3.0], r: 0.6 },
+    };
+    const planets = {};
+    Object.entries(SECTORS).forEach(([id, s]) => {
+      const grp = new THREE.Group(); grp.position.set(...s.pos); table.add(grp);
+      const core = new THREE.Mesh(new THREE.SphereGeometry(s.r, 48, 32), fresnel(s.color, 2.2, 1.0, 0.05)); grp.add(core);
+      const wire = new THREE.LineSegments(new THREE.WireframeGeometry(new THREE.IcosahedronGeometry(s.r * 1.012, 2)), new THREE.LineBasicMaterial({ color: s.color, transparent: true, opacity: 0.25, blending: THREE.AdditiveBlending, depthWrite: false }));
+      grp.add(wire);
+      const ring = new THREE.Mesh(new THREE.TorusGeometry(s.r * 1.65, 0.012, 6, 160), new THREE.MeshBasicMaterial({ color: s.color, transparent: true, opacity: 0.35, blending: THREE.AdditiveBlending, depthWrite: false }));
+      ring.rotation.x = Math.PI / 2 - 0.35; grp.add(ring);
+      const halo = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTex, color: s.color, transparent: true, opacity: 0.35, blending: THREE.AdditiveBlending, depthWrite: false }));
+      halo.scale.setScalar(s.r * 5.2); grp.add(halo);
+      // star markers orbiting (shown when the sector is targeted for stars)
+      const starMarks = new THREE.Group(); starMarks.rotation.x = ring.rotation.x; grp.add(starMarks);
+      for (let k = 0; k < 3; k++) {
+        const m = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTex, color: 0xffd75e, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false }));
+        const a = k / 3 * Math.PI * 2; m.position.set(Math.cos(a) * s.r * 1.65, Math.sin(a) * s.r * 1.65, 0); m.scale.setScalar(0.42); starMarks.add(m);
+      }
+      // projection line to the table
+      const stem = new THREE.Mesh(new THREE.CylinderGeometry(0.01, 0.01, s.pos[1] + 0.0, 6), new THREE.MeshBasicMaterial({ color: s.color, transparent: true, opacity: 0.3, blending: THREE.AdditiveBlending, depthWrite: false }));
+      stem.position.y = -s.pos[1] / 2; grp.add(stem);
+      planets[id] = { grp, core, wire, ring, halo, starMarks, stem, cur: 0.25, target: 0.25, stars: 0, state: 'off', base: s };
+    });
+
+    // Kyber crystal field (roster)
+    const crystals = new THREE.Group(); crystals.position.set(0, -15, -2); world.add(crystals);
+    const KYBER = [0x8dffb2, 0x74e6ff, 0x5cb8ff, 0xb48cff, 0xff4d5e, 0xffb547, 0xeafcff, 0x8dffb2, 0x74e6ff];
+    const crystalGeo = new THREE.OctahedronGeometry(1, 0); crystalGeo.scale(0.55, 1.6, 0.55);
+    const edgeGeo = new THREE.EdgesGeometry(crystalGeo);
+    const crystalList = KYBER.map((c, i) => {
+      const grp = new THREE.Group();
+      const a = i / KYBER.length * Math.PI * 2, r = 4.2 + (i % 3) * 0.9;
+      grp.position.set(Math.cos(a) * r, (i % 4 - 1.5) * 0.9, Math.sin(a) * r);
+      grp.add(new THREE.Mesh(crystalGeo, fresnel(c, 1.6, 1.3, 0.08)));
+      grp.add(new THREE.LineSegments(edgeGeo, new THREE.LineBasicMaterial({ color: c, transparent: true, opacity: 0.85, blending: THREE.AdditiveBlending, depthWrite: false })));
+      const glow = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTex, color: c, transparent: true, opacity: 0.5, blending: THREE.AdditiveBlending, depthWrite: false })); glow.scale.setScalar(2.6); grp.add(glow);
+      grp.userData = { spin: 0.2 + Math.random() * 0.4, phase: Math.random() * 6.28, tilt: (Math.random() - 0.5) * 0.6 };
+      grp.rotation.z = grp.userData.tilt;
+      crystals.add(grp); return grp;
+    });
+    const coreCrystal = new THREE.Group(); crystals.add(coreCrystal);
+    const bigGeo = new THREE.OctahedronGeometry(1, 0); bigGeo.scale(0.9, 2.6, 0.9);
+    coreCrystal.add(new THREE.Mesh(bigGeo, fresnel(0x8dffb2, 1.4, 1.6, 0.12)));
+    coreCrystal.add(new THREE.LineSegments(new THREE.EdgesGeometry(bigGeo), new THREE.LineBasicMaterial({ color: 0xb8ffd0, transparent: true, opacity: 0.9, blending: THREE.AdditiveBlending, depthWrite: false })));
+    const coreGlow = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTex, color: 0x8dffb2, transparent: true, opacity: 0.55, blending: THREE.AdditiveBlending, depthWrite: false })); coreGlow.scale.setScalar(6); coreCrystal.add(coreGlow);
+
+    // Camera path (scroll progress p: 0 hero → 1 plan → 2 roster → 3 guides)
+    const V = (x, y, z) => new THREE.Vector3(x, y, z);
+    const KEYS = [
+      { p: 0.0, pos: V(-5, 3.6, 16.5), look: V(-10.2, 0.6, 0) },
+      { p: 0.85, pos: V(-1.5, 5.2, 11), look: V(2.6, 0.2, 0) },
+      { p: 1.0, pos: V(-1.0, 6.0, 10.5), look: V(2.8, 0, 0) },
+      { p: 1.9, pos: V(1.0, 4.5, 10.5), look: V(2.8, 0, 0) },
+      { p: 2.0, pos: V(0, -11.5, 9), look: V(0, -15, -2) },
+      { p: 2.95, pos: V(0, -13.5, 10.5), look: V(0, -15, -2) },
+      { p: 3.0, pos: V(-2, 2, 22), look: V(-6.5, -0.5, 0) },
+      { p: 4.0, pos: V(-2, 3, 25), look: V(-6.5, -0.5, 0) },
+    ];
+    const mobileShift = () => innerWidth < 900;
+    function camAt(p) {
+      let a = KEYS[0], b = KEYS[KEYS.length - 1];
+      for (let i = 0; i < KEYS.length - 1; i++) if (p >= KEYS[i].p && p <= KEYS[i + 1].p) { a = KEYS[i]; b = KEYS[i + 1]; break; }
+      const k = b.p === a.p ? 0 : (p - a.p) / (b.p - a.p);
+      const e = k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2; // ease-in-out between keys
+      const pos = a.pos.clone().lerp(b.pos, e), look = a.look.clone().lerp(b.look, e);
+      if (mobileShift()) { look.x *= 0.15; pos.z += 3; pos.y += 1; look.y -= 4 * Math.max(0, 1 - p / 0.85); }
+      return { pos, look };
+    }
+
+    let progress = 0, pointerX = 0, pointerY = 0;
+    const camPos = camera.position.clone(), camLook = V(0, 0.6, 0);
+    let running = true, last = performance.now(), time = 0;
+    const lanesTarget = {};
+
+    function setScroll(p) { progress = p; }
+    function setLanes(lanes) {
+      Object.keys(planets).forEach(id => { const st = lanes[id]; planets[id].state = st ? st.state : 'off'; planets[id].stars = st && st.state === 'stars' ? (st.stars || 3) : 0; });
+      Object.assign(lanesTarget, lanes);
+    }
+    let warpStart = 0, warping = false;
+    function startWarp() { warping = true; warpStart = performance.now(); streaks.visible = true; }
+    function resize() {
+      renderer.setSize(innerWidth, innerHeight, false);
+      camera.aspect = innerWidth / innerHeight; camera.fov = innerWidth < 600 ? 58 : 45; camera.updateProjectionMatrix();
+    }
+    addEventListener('resize', resize); resize();
+    addEventListener('pointermove', e => { if (!finePointer.matches) return; pointerX = e.clientX / innerWidth - 0.5; pointerY = e.clientY / innerHeight - 0.5; }, { passive: true });
+    document.addEventListener('visibilitychange', () => { running = !document.hidden; if (running) { last = performance.now(); requestAnimationFrame(loop); } });
+
+    const STATE_LEVEL = { stars: 1.0, go: 0.85, preload: 0.5, cms: 0.6, avoid: 0.45, off: 0.16 };
+    const red = new THREE.Color(0xff3344);
+    function loop(now) {
+      if (!running) return;
+      const dt = Math.min(0.05, (now - last) / 1000); last = now; time += dt;
+      const reduce = reduceMotion.matches;
+      const damp = reduce ? 1 : 1 - Math.exp(-dt * 3.2);
+
+      // hyperspace arrival
+      if (warping) {
+        const k = Math.min(1, Math.max(0, (performance.now() - warpStart) / 1900));
+        const e = 1 - Math.pow(1 - k, 3);
+        streakMat.uniforms.uStretch.value = (1 - e) * 46;
+        streakMat.uniforms.uAlpha.value = (1 - e) * 0.9;
+        starMat.opacity = 0.2 + e * 0.7;
+        if (k >= 1) { warping = false; streaks.visible = false; }
+      }
+
+      // camera follows the scroll path, smoothed (retargets mid-flight)
+      const c = camAt(reduce ? 0.9 : progress);
+      camPos.lerp(c.pos, damp); camLook.lerp(c.look, damp);
+      camera.position.copy(camPos);
+      if (!reduce) { camera.position.x += pointerX * 0.8; camera.position.y -= pointerY * 0.5; }
+      camera.lookAt(camLook);
+
+      if (!reduce) {
+        stars.rotation.y = time * 0.006;
+        table.rotation.y = Math.sin(time * 0.12) * 0.08 + (progress > 1 && progress < 2 ? (progress - 1) * 0.5 : 0);
+        const pos = moteGeo.attributes.position;
+        for (let i = 0; i < MOTE_N; i++) { let y = pos.getY(i) + dt * (0.25 + mseed[i] * 0.4); if (y > 5) y = 0; pos.setY(i, y); }
+        pos.needsUpdate = true;
+        crystals.rotation.y = time * 0.08 + (progress - 2) * 1.4;
+        crystalList.forEach(cr => { cr.rotation.y += dt * cr.userData.spin; cr.position.y += Math.sin(time * 0.9 + cr.userData.phase) * dt * 0.25; });
+        coreCrystal.rotation.y = time * 0.35; coreCrystal.position.y = Math.sin(time * 0.8) * 0.25;
+      }
+
+      // sector planets follow the active phase
+      Object.values(planets).forEach(pl => {
+        pl.target = STATE_LEVEL[pl.state] || 0.16;
+        pl.cur += (pl.target - pl.cur) * (reduce ? 1 : 1 - Math.exp(-dt * 4));
+        let lvl = pl.cur;
+        if (!reduce && pl.state === 'preload') lvl *= 0.75 + 0.25 * Math.sin(time * 3);
+        if (!reduce && pl.state === 'avoid') lvl *= 0.7 + 0.3 * Math.abs(Math.sin(time * 6));
+        pl.core.material.uniforms.uIntensity.value = 0.25 + lvl * 1.5;
+        pl.wire.material.opacity = 0.06 + lvl * 0.42;
+        pl.ring.material.opacity = 0.08 + lvl * 0.45;
+        pl.halo.material.opacity = 0.05 + lvl * 0.4;
+        pl.stem.material.opacity = 0.05 + lvl * 0.35;
+        const col = pl.state === 'avoid' ? red : new THREE.Color(pl.base.color);
+        pl.core.material.uniforms.uColor.value.lerp(col, 0.1);
+        pl.wire.rotation.y += dt * (0.08 + lvl * 0.3) * (reduce ? 0 : 1);
+        pl.starMarks.rotation.z += dt * 0.6 * (reduce ? 0 : 1);
+        pl.starMarks.children.forEach((m, k) => { const want = k < pl.stars ? 1 : 0; m.material.opacity += (want - m.material.opacity) * (reduce ? 1 : 0.08); });
+        const s = 1 + (lvl - 0.5) * 0.08; pl.grp.scale.setScalar(s);
+      });
+
+      renderer.render(world, camera);
+      requestAnimationFrame(loop);
+    }
+    requestAnimationFrame(loop);
+    return { setScroll, setLanes, startWarp };
+  }
+
+  /* ───────── Editor ───────── */
+  let key = null, markdown = '', dirty = false;
+  function setupEditor() {
+    const ed = $('#editor'), src = $('#editor-source'), status = $('#editor-status'), btn = document.querySelector('[data-action="edit"]');
+    const setStatus = (m, k) => { status.textContent = m; status.className = 'status' + (k ? ' is-' + k : ''); };
+    const open = () => { src.value = markdown; ed.classList.add('is-open'); ed.setAttribute('aria-hidden', 'false'); btn.setAttribute('aria-expanded', 'true'); setStatus(''); setTimeout(() => src.focus({ preventScroll: true }), 50); };
+    const close = () => { if (dirty && !confirm('Discard your unsaved changes?')) return; if (dirty) { dirty = false; render(markdown); wire(false); onScroll(); } ed.classList.remove('is-open'); ed.setAttribute('aria-hidden', 'true'); btn.setAttribute('aria-expanded', 'false'); btn.focus(); };
+    btn.addEventListener('click', () => ed.classList.contains('is-open') ? close() : open());
+    $('#editor-close').addEventListener('click', close);
+    document.addEventListener('keydown', e => { if (e.key === 'Escape' && ed.classList.contains('is-open') && e.target === document.body) close(); });
+    let t = null;
+    src.addEventListener('input', () => { dirty = true; clearTimeout(t); t = setTimeout(() => { render(src.value); wire(false); currentPhase = -1; onScroll(); }, 450); });
+    src.addEventListener('keydown', e => { if (e.key === 'Tab' && !e.shiftKey) { e.preventDefault(); src.setRangeText('  ', src.selectionStart, src.selectionEnd, 'end'); src.dispatchEvent(new Event('input')); } });
+    $('#editor-download').addEventListener('click', async () => {
+      const p1 = $('#editor-new1').value, p2 = $('#editor-new2').value;
+      if (p1 || p2) {
+        if (p1 !== p2) { setStatus('The two new passwords do not match.', 'error'); return; }
+        if (p1.length < 8) { setStatus('The new password is too short (8 characters minimum, longer is safer).', 'error'); return; }
+      }
+      const b = $('#editor-download'); b.disabled = true; setStatus('Encrypting…');
+      try {
+        let k = key, salt = window.NK_KK_MEMBERS.salt;
+        if (p1) { const s = crypto.getRandomValues(new Uint8Array(16)); k = await deriveKey(p1, s); salt = toB64(s); }
+        const iv = crypto.getRandomValues(new Uint8Array(12));
+        const ct = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, k, new TextEncoder().encode(src.value));
+        const payload = { v: 1, kdf: 'PBKDF2-SHA256', iter: ITERATIONS, cipher: 'AES-256-GCM', salt, iv: toB64(iv), ct: toB64(ct) };
+        const file = '/* Kinderkarten members area: encrypted content (AES-256-GCM, PBKDF2-SHA256).\n   Generated ' + new Date().toISOString().slice(0, 10) + ' from the War Room editor. Do not edit by hand. */\nwindow.NK_KK_MEMBERS = ' + JSON.stringify(payload) + ';\n';
+        const url = URL.createObjectURL(new Blob([file], { type: 'text/javascript' }));
+        const a = document.createElement('a'); a.href = url; a.download = 'kinderkarten-members.data.js'; document.body.appendChild(a); a.click(); a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+        window.NK_KK_MEMBERS = payload; key = k; markdown = src.value; dirty = false; await saveKey(k);
+        setStatus(p1 ? 'Downloaded with the NEW password. Replace kinderkarten-members.data.js on GitHub and Netlify, then share the new password.' : 'Downloaded. Replace kinderkarten-members.data.js on GitHub and Netlify to publish it.', 'ok');
+      } catch (e) { setStatus('Encryption failed: ' + e.message, 'error'); }
+      finally { b.disabled = false; }
+    });
+    addEventListener('beforeunload', e => { if (dirty) { e.preventDefault(); e.returnValue = ''; } });
+  }
+
+  /* ───────── Boot ───────── */
+  async function boot() {
+    const gate = $('#gate');
+    const fail = (title, sub) => {
+      gate.querySelector('[data-gate-title]').textContent = title;
+      gate.querySelector('[data-gate-sub]').innerHTML = sub;
+      gate.querySelector('.gate-ring').style.display = 'none';
+    };
+    if (!window.isSecureContext || !window.crypto || !crypto.subtle) { fail('Secure connection required', 'Open the site over HTTPS.'); return; }
+    if (!window.NK_KK_MEMBERS || !window.marked) { fail('Transmission lost', 'The members file could not be loaded. <a href="' + LOCK_URL + '">Try again</a>.'); return; }
+    key = await storedKey();
+    if (!key) { location.replace(LOCK_URL); return; }
+    try {
+      const d = window.NK_KK_MEMBERS;
+      const plain = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: fromB64(d.iv) }, key, fromB64(d.ct));
+      markdown = new TextDecoder().decode(plain);
+    } catch (e) { forgetKey(); location.replace(LOCK_URL); return; }
+
+    let warpIn = false;
+    try { warpIn = sessionStorage.getItem(WARP_FLAG) === '1'; sessionStorage.removeItem(WARP_FLAG); } catch (e) {}
+
+    render(markdown);
+    $('#main').hidden = false;
+    scene = makeScene();
+    wire(true);
+    setupEditor();
+    addEventListener('scroll', onScroll, { passive: true });
+    addEventListener('resize', onScroll);
+    onScroll();
+    if (warpIn && scene && !reduceMotion.matches) scene.startWarp();
+    gate.classList.add('is-done');
+
+    document.querySelector('[data-action="lock"]').addEventListener('click', () => {
+      if (dirty && !confirm('Discard your unsaved changes?')) return;
+      dirty = false; forgetKey(); location.href = 'index.html#/kinderkarten-members';
+    });
+  }
+  boot();
+})();
+</script>
+</body>
+</html>
