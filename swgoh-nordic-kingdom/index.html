@@ -44,6 +44,9 @@
 
   ::selection { background: rgba(0, 212, 255, 0.35); color: #fff; }
 
+  /* Pointer or touch users do not get the focus ring when focus is moved for them (e.g. after a page opens) */
+  html.pointer-nav :focus-visible { outline: none; }
+  html.pointer-nav .guild-card:has(.gc-link:focus-visible)::after { opacity: 0; }
   a:focus-visible, button:focus-visible {
     outline: 2px solid var(--accent);
     outline-offset: 3px;
@@ -206,8 +209,6 @@
     border: 1px solid rgba(var(--btn), 0.6);
     border-radius: 4px;
     text-shadow: 0 1px 4px rgba(0,0,0,0.8);
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
     transition: background-color 200ms ease, border-color 200ms ease, box-shadow 200ms ease, scale 160ms var(--ease-out);
   }
   .btn svg { flex-shrink: 0; }
@@ -566,12 +567,7 @@
   /* Content entrance when a guild page opens.
      Lead: the guild name. Support: motto, actions, history panel (shorter moves, shrinking gaps).
      Decoration (label, divider): fade only. The Back button is static: usable from frame one. */
-  .guild-page.is-entering .gp-label,
-  .guild-page.is-entering .gp-header > div:not(.gp-actions) { animation: fade-in 560ms var(--ease-out) 220ms backwards; }
-  .guild-page.is-entering .gp-h1    { animation: rise 700ms var(--ease-out) 160ms backwards; }
-  .guild-page.is-entering .gp-devise { animation: rise-sm 600ms var(--ease-out) 280ms backwards; }
-  .guild-page.is-entering .gp-actions { animation: rise-sm 600ms var(--ease-out) 360ms backwards; }
-  .guild-page.is-entering .gp-body  { animation: rise-sm 680ms var(--ease-out) 420ms backwards; }
+  .guild-page.is-entering .gp-header { animation: rise-sm 620ms var(--ease-out) 120ms backwards; }
 
   /* Fallback page transitions (browsers without View Transitions) */
   @keyframes page-fade-in  { from { opacity: 0; } to { opacity: 1; } }
@@ -703,39 +699,17 @@
   }
 
   /* ── VIEW TRANSITIONS: entering a guild ──
-     The focal moment. Hovering a card already shows the guild's world behind the home;
-     on click that same image becomes the guild page (shared "guild-backdrop"), the emblem
-     travels from the card to the page header ("guild-emblem"), and the home recedes into it.
-     Without a hover preview (touch, keyboard) the world fades up from a slight zoom.
-     Leaving is the same path in reverse, faster. */
-  ::view-transition-group(home-ui) { z-index: 1; }
+     The guild page dissolves in over the home as one piece (backdrop and glass panels rendered
+     together, so the frosted glass never switches style mid-way), with a slight push-in; the
+     guild emblem travels from the card to the page header. Leaving is the same, faster. */
   ::view-transition-group(guild-emblem) { z-index: 2; animation-duration: 760ms; animation-timing-function: var(--ease-in-out); }
-  html[data-nav="back"]::view-transition-group(guild-emblem) { animation-duration: 600ms; }
-  html[data-nav="forward"]::view-transition-old(home-ui):only-child { animation: vt-recede 480ms var(--ease-out) both; }
+  html[data-nav="back"]::view-transition-group(guild-emblem) { animation-duration: 560ms; }
   ::view-transition-old(guild-emblem),
   ::view-transition-new(guild-emblem) { animation-duration: 760ms; height: 100%; }
-
-  ::view-transition-group(guild-backdrop) { animation-duration: 640ms; animation-timing-function: var(--ease-out); }
-  ::view-transition-old(guild-backdrop),
-  ::view-transition-new(guild-backdrop) { animation-duration: 640ms; animation-timing-function: var(--ease-out); }
-  ::view-transition-new(guild-backdrop):only-child { animation: vt-world-in 620ms var(--ease-out) both; }
-  ::view-transition-old(guild-backdrop):only-child { animation: page-fade-out 380ms var(--ease-out) both; }
-
-  /* The content container does not fade: its own children carry the entrance (one entrance per container) */
-  ::view-transition-new(guild-content):only-child { animation: none; }
-  ::view-transition-old(guild-content):only-child { animation: vt-leave 320ms var(--ease-out) both; }
-
-  html[data-nav="forward"]::view-transition-old(root) { animation: vt-recede 480ms var(--ease-out) both; }
-  html[data-nav="forward"]::view-transition-new(root) { animation: none; }
-  /* Back: the home is already fully there underneath; it only settles (scale + blur), so there is no dark dip */
-  html[data-nav="back"]::view-transition-old(root)    { animation: none; opacity: 0; }
-  html[data-nav="back"]::view-transition-new(root)    { animation: vt-return 520ms var(--ease-out) both; }
-
-  /* Opacity and transform only: full-screen snapshots stay on the compositor (a blur here dropped frames) */
-  @keyframes vt-world-in { from { opacity: 0; transform: scale(1.04); } }
-  @keyframes vt-recede   { to { opacity: 0; transform: scale(0.97); } }
-  @keyframes vt-leave    { to { opacity: 0; transform: translateY(12px); } }
-  @keyframes vt-return   { from { transform: scale(0.97); } }
+  html[data-nav]::view-transition-old(root) { animation: none; }
+  html[data-nav="forward"]::view-transition-new(root) { animation: vt-arrive 560ms var(--ease-out) both; }
+  html[data-nav="back"]::view-transition-new(root)    { animation: fade-in 380ms var(--ease-out) both; }
+  @keyframes vt-arrive { from { opacity: 0; transform: scale(1.015); } }
 
   /* ── RESPONSIVE ── */
   @media (max-width: 600px) {
@@ -779,6 +753,7 @@
     .hero-in, .header-line.hero-in, .header-subtitle.hero-in, .cta-row.hero-in, h1.hero-title {
       animation: fade-in 240ms ease-out both;
     }
+    .guild-page.is-entering .gp-header,
     .guild-page.is-entering .gp-label,
     .guild-page.is-entering .gp-header > div:not(.gp-actions),
     .guild-page.is-entering .gp-h1,
@@ -1958,14 +1933,10 @@ const router = (function() {
     const page = pages.get(id);
     const emblem = cardOf(id)?.querySelector('.gc-icon img');
     if (inViewport(emblem)) name(emblem, 'guild-emblem');
-    name(preview.layerShowing(cardOf(id)?.dataset.bg), 'guild-backdrop');
-    name(wrapper, 'home-ui'); // home content recedes *over* the guild world
     return page;
   }
   function namePageSide(id) {
     const page = pages.get(id);
-    name(page.querySelector('.gp-backdrop'), 'guild-backdrop');
-    name(page.querySelector('.gp-inner'), 'guild-content');
     const emblem = page.querySelector('.gp-emblem');
     if (!inViewport(emblem)) return false;
     name(emblem, 'guild-emblem');
@@ -2072,6 +2043,9 @@ const router = (function() {
   });
   window.addEventListener('hashchange', sync);   // URL typed or edited by hand
   window.addEventListener('popstate', sync);     // browser Back / Forward
+  // Input modality: keyboard users see focus rings, pointer and touch users do not
+  document.addEventListener('pointerdown', () => root.classList.add('pointer-nav'), true);
+  document.addEventListener('keydown', e => { if (e.key === 'Tab') root.classList.remove('pointer-nav'); }, true);
   document.addEventListener('keydown', e => {
     if (e.key !== 'Escape' || !current) return;
     if (e.target.closest('input, textarea, select')) return; // Esc in a form field is not "leave the page"
