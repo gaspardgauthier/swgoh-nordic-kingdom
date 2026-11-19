@@ -533,7 +533,9 @@
           if (strong) rest = rest.slice(rest.indexOf(strong.textContent) + strong.textContent.length);
           rest = rest.replace(/^\s*[—–:-]\s*/, '').trim();
           const start = list.tagName === 'OL' ? (+list.getAttribute('start') || 1) : 1;
-          return { n: start + i, name, units: rest ? parseUnits(rest) : [] };
+          // relics in ascending order (R6 → R9); stable, units without a level go last
+          const units = rest ? parseUnits(rest).map((u, k) => ({ u, k })).sort((a, b) => ((+a.u.level || 99) - (+b.u.level || 99)) || a.k - b.k).map(x => x.u) : [];
+          return { n: start + i, name, units };
         }) : [];
         const allUnits = players.flatMap(p => p.units);
         rosterStats = { players: players.length, units: allUnits.length, r9: allUnits.filter(u => u.level === '9').length };
