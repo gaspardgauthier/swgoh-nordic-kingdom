@@ -358,7 +358,6 @@
   .pd-none { color: var(--faint); padding: 3px 0; }
   .pd-reason { grid-column: 2 / -1; color: var(--muted); font-size: 0.88rem; font-style: italic; }
   .pd-row.is-out .pd-name { color: var(--muted); }
-  .pd-foot { margin-top: 14px; padding: 12px 0 10px; border-top: 1px solid var(--line); color: var(--faint); font-size: 0.82rem; }
   @media (max-width: 760px) {
     .pd-grid { display: block; }
     .pd-th { display: none; }
@@ -1147,7 +1146,6 @@
   let key = null, markdown = '';
 
   /* ───────── Player dialog ───────── */
-  const PD_FOOT = `<p class="pd-foot">Where each unit can join a platoon on each day of the plan: the planet must be open that day (stars or preload), need the unit, and the unit\'s relic must reach the planet\'s level. A unit can be placed once per phase. ×N: copies needed across that planet\'s 6 platoons. Phases 1 and 2 are not covered yet.</p>`;
   const shortName = n => n.replace('-class Medical Station', '').replace('Ring of ', '');
   function openPlayer(i) {
     const p = rosterPlayers[i]; const dlg = $('#player-dialog');
@@ -1175,7 +1173,6 @@
     body.innerHTML = p.units.length
       ? `<div class="pd-grid" style="--days:${days.length}" role="table" aria-label="Deployment by phase"><div class="pd-row" role="row"><span class="pd-th" role="columnheader">Unit</span>${days.map(d => `<span class="pd-th" role="columnheader">Phase ${d.phase}</span>`).join('')}</div>${rows}</div>`
       : '';
-    body.insertAdjacentHTML('beforeend', PD_FOOT);
     body.scrollTop = 0;
     dlg.classList.remove('is-closing');
     if (!dlg.open) dlg.showModal();
