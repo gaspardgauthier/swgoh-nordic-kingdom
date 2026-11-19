@@ -8,6 +8,7 @@
 <link rel="icon" type="image/png" href="images/icon-nordic-kingdom.png">
 <meta name="description" content="Nordic Kingdom — a 10-guild alliance in Star Wars: Galaxy of Heroes. Guild histories, leaders and recruitment.">
 <script>document.documentElement.classList.add('js');</script>
+<script>(function(){var v;try{v=localStorage.getItem('nk-view')}catch(e){}if(v!=='map'&&v!=='list'){v=matchMedia('(min-width: 900px) and (hover: hover) and (pointer: fine)').matches?'map':'list'}document.documentElement.dataset.view=v})();</script>
 <style>
   @font-face { font-family: 'Nordvik'; src: url('fonts/nordvik.ttf') format('truetype'); font-display: swap; }
   @font-face { font-family: 'GreekFreak'; src: url('fonts/greekfreak.ttf') format('truetype'); font-display: swap; }
@@ -698,6 +699,134 @@
     .mb-form.is-shaking .mb-field { animation: none; }
   }
 
+
+  /* ── GUILDS VIEW: map / list ── */
+  .view-toggle { display: none; justify-content: center; margin: -28px auto 24px; padding: 0 20px; }
+  html.js .view-toggle { display: flex; }
+  .view-toggle-inner {
+    position: relative; display: inline-flex; padding: 4px; border-radius: 999px;
+    background: rgba(2,4,15,0.6); border: 1px solid rgba(255,255,255,0.18);
+    backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  }
+  .view-toggle button {
+    position: relative; z-index: 1; display: inline-flex; align-items: center; gap: 8px; padding: 8px 18px; border: 0; border-radius: 999px;
+    background: none; color: rgba(255,255,255,0.7); cursor: pointer;
+    font-family: 'Orbitron', monospace; font-size: 0.66rem; letter-spacing: 0.16em; text-transform: uppercase;
+    transition: color 200ms ease;
+  }
+  .view-toggle button svg { width: 14px; height: 14px; }
+  .view-toggle button[aria-pressed="true"] { color: #fff; }
+  .view-toggle-thumb {
+    position: absolute; top: 4px; bottom: 4px; left: 4px; border-radius: 999px;
+    background: rgba(0, 212, 255, 0.16); border: 1px solid rgba(0, 212, 255, 0.55); box-shadow: 0 0 14px rgba(0, 212, 255, 0.25);
+    transition: transform 320ms var(--ease-out), width 320ms var(--ease-out);
+  }
+  @media (hover: hover) and (pointer: fine) { .view-toggle button:hover { color: #fff; } }
+
+  .galaxy { display: none; position: relative; max-width: 1180px; margin: 0 auto 40px; padding: 0 20px; }
+  html[data-view="map"] .galaxy { display: block; }
+  html[data-view="map"] main { display: none; }
+  .galaxy-stage { position: relative; height: clamp(520px, 78vh, 760px); margin-top: -8px; border-radius: 20px; overflow: hidden; opacity: 0; transition: opacity 700ms var(--ease-out); }
+  .galaxy-stage.is-live { opacity: 1; }
+  .galaxy-stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: pan-y; }
+  .galaxy-labels { position: absolute; inset: 0; pointer-events: none; }
+  .planet-label {
+    position: absolute; left: 0; top: 0; pointer-events: auto; display: flex; flex-direction: column; align-items: center; gap: 2px;
+    padding: 5px 10px 6px; border-radius: 8px; text-decoration: none; white-space: nowrap; will-change: transform;
+    color: #fff; background: rgba(2,4,15,0.42); border: 1px solid transparent;
+    transition: background-color 200ms ease, border-color 200ms ease, opacity 300ms ease;
+    opacity: 0;
+  }
+  .galaxy-stage.is-live .planet-label { opacity: 1; }
+  .planet-label b { font-family: 'Orbitron', monospace; font-size: 0.64rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
+  .planet-label span { font-size: 0.7rem; letter-spacing: 0.08em; color: var(--accent); }
+  .planet-label.is-hot, .planet-label:focus-visible { background: rgba(2,4,15,0.78); border-color: color-mix(in srgb, var(--accent) 70%, transparent); outline: none; }
+  .galaxy-hint { margin-top: 10px; text-align: center; font-size: 0.82rem; color: var(--text-dim); }
+
+  /* ── OUR STORY: alliance timeline ── */
+  .story { position: relative; z-index: 1; max-width: 1040px; margin: 0 auto; padding: 40px 20px 120px; }
+  .story-head { text-align: center; margin-bottom: 56px; }
+  .story-title {
+    font-family: 'Nordvik', serif; font-size: clamp(2.2rem, 5.5vw, 3.8rem); font-weight: 900; letter-spacing: 0.08em; line-height: 1.05;
+    background: linear-gradient(180deg, #e8e8e8 0%, #a8a8a8 20%, #d0d0d0 35%, #f8f8f8 50%, #909090 65%, #c8c8c8 80%, #e0e0e0 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+  .story-lead { max-width: 560px; margin: 14px auto 0; color: rgba(255,255,255,0.78); line-height: 1.6; }
+  .tl-wrap { position: relative; }
+  .tl { list-style: none; padding: 0; margin: 0; }
+  .tl-line { position: absolute; left: 50%; top: 6px; bottom: 6px; width: 2px; translate: -1px 0; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; }
+  .tl-fill { position: absolute; inset: 0; transform-origin: 50% 0; transform: scaleY(var(--p, 1)); background: linear-gradient(to bottom, #e03030, #2a8a3a 22%, #00d4ff 60%, #e8c020); box-shadow: 0 0 12px rgba(0,212,255,0.6); }
+  .tl-item { position: relative; display: grid; grid-template-columns: 1fr 64px 1fr; align-items: start; margin-bottom: 34px; }
+  .tl-node {
+    grid-column: 2; justify-self: center; margin-top: 4px; width: 16px; height: 16px; border-radius: 50%;
+    background: #02040f; border: 2px solid rgba(255,255,255,0.3);
+    transition: border-color 400ms ease, box-shadow 400ms ease, background-color 400ms ease, scale 400ms var(--ease-out);
+  }
+  .tl-card {
+    grid-row: 1; padding: 14px 18px 16px; border-radius: 12px; background: rgba(2,4,15,0.55); border: 1px solid rgba(255,255,255,0.12);
+    backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+    transition: border-color 400ms ease, opacity 400ms ease;
+  }
+  .tl-item:nth-child(odd) .tl-card { grid-column: 1; text-align: right; }
+  .tl-item:nth-child(even) .tl-card { grid-column: 3; }
+  .tl-date { display: block; font-family: 'Orbitron', monospace; font-size: 0.72rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent); margin-bottom: 6px; }
+  .tl-card h3 { font-family: 'Exo 2', sans-serif; font-weight: 600; font-size: 1.1rem; color: #fff; line-height: 1.3; }
+  .tl-card p { margin-top: 6px; color: rgba(255,255,255,0.78); line-height: 1.55; font-size: 0.95rem; }
+  .tl-chip { display: inline-flex; align-items: center; gap: 7px; margin-top: 10px; font-family: 'Orbitron', monospace; font-size: 0.62rem; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(255,255,255,0.75); }
+  .tl-chip img { width: 18px !important; height: 18px !important; }
+  .tl-item.is-major .tl-card { border-color: color-mix(in srgb, var(--accent) 55%, transparent); background: rgba(2,4,15,0.7); }
+  .tl-item.is-major h3 { font-size: 1.35rem; }
+  .tl-item.is-major .tl-node { width: 22px; height: 22px; margin-top: 1px; }
+  /* scroll-linked state: content stays visible; the node lights up when the line reaches it */
+  .js .tl-item:not(.is-reached) .tl-card { opacity: 0.55; }
+  .tl-item.is-reached .tl-node { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 35%, #02040f); box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 18%, transparent), 0 0 18px var(--accent); scale: 1.08; }
+  .tl-item[data-guild="susilauma"].is-reached .tl-node { background: #111; }
+
+  /* ── Kinderkarten: leaders through the years ── */
+  .kk-tl { margin-bottom: 24px; }
+  .kk-axis { position: relative; height: 22px; margin: 0 0 6px var(--name-w); }
+  .kk-tick { position: absolute; top: 0; translate: -50% 0; font-family: 'Orbitron', monospace; font-size: 0.62rem; letter-spacing: 0.1em; color: rgba(255,255,255,0.55); }
+  .kk-rows { list-style: none; padding: 0; margin: 0; --name-w: 250px; }
+  .kk-tl { --name-w: 250px; }
+  .kk-row { display: grid; grid-template-columns: var(--name-w) 1fr; align-items: center; gap: 0; padding: 7px 0; border-top: 1px solid rgba(255,255,255,0.07); }
+  .kk-name { font-weight: 600; color: #fff; font-size: 0.95rem; line-height: 1.25; padding-right: 12px; }
+  .kk-name small { display: block; font-weight: 400; font-size: 0.78rem; color: rgba(255,255,255,0.6); margin-top: 2px; }
+  .kk-track { position: relative; height: 14px; border-radius: 7px; background: repeating-linear-gradient(to right, rgba(255,255,255,0.06) 0 1px, transparent 1px calc(100% / var(--years))); }
+  .kk-bar {
+    position: absolute; top: 0; bottom: 0; left: var(--s); width: max(6px, calc(var(--e) - var(--s))); border-radius: 7px;
+    background: linear-gradient(90deg, #2a8a3a, #59e07a); box-shadow: 0 0 12px rgba(89, 224, 122, 0.45);
+    transform-origin: 0 50%;
+  }
+  .kk-row.is-current .kk-bar { background: linear-gradient(90deg, #2a8a3a, #8dffb2); box-shadow: 0 0 16px rgba(141, 255, 178, 0.7); }
+  .kk-row.is-current .kk-bar::after { content: ''; position: absolute; right: -3px; top: 50%; width: 8px; height: 8px; translate: 0 -50%; border-radius: 50%; background: #d8ffe4; box-shadow: 0 0 10px #8dffb2; }
+  .js .kk-tl.will-grow .kk-bar { transform: scaleX(0); }
+  .kk-tl.is-grown .kk-bar { transform: scaleX(1); transition: transform 760ms var(--ease-out) var(--d, 0ms); }
+  .kk-born { display: flex; align-items: center; gap: 10px; margin-top: 14px; font-size: 0.9rem; color: rgba(255,255,255,0.8); }
+  .kk-born::before { content: ''; width: 10px; height: 10px; flex: none; rotate: 45deg; background: #59e07a; box-shadow: 0 0 10px #59e07a; }
+
+  @media (max-width: 760px) {
+    .tl-line { left: 15px; }
+    .tl-item { grid-template-columns: 32px 1fr; margin-bottom: 22px; }
+    .tl-node { grid-column: 1; }
+    .tl-item:nth-child(odd) .tl-card, .tl-item:nth-child(even) .tl-card { grid-column: 2; text-align: left; }
+    .story-head { margin-bottom: 36px; }
+    .kk-tl, .kk-rows { --name-w: 0px; }
+    .kk-axis { margin-left: 0; }
+    .kk-row { grid-template-columns: 1fr; gap: 6px; }
+    .kk-name { padding-right: 0; }
+    .galaxy { padding: 0 4px; }
+    .galaxy-stage { height: clamp(440px, 64vh, 560px); }
+    .planet-label { padding: 3px 6px; background: rgba(2,4,15,0.55); }
+    .planet-label b { font-size: 0.56rem; letter-spacing: 0.06em; }
+    .planet-label span { display: none; }
+    .kk-tick:nth-child(even) { display: none; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .view-toggle-thumb, .galaxy-stage, .tl-node, .tl-card { transition: none; }
+    .js .tl-item:not(.is-reached) .tl-card { opacity: 1; }
+    .js .kk-tl.will-grow .kk-bar, .kk-tl.is-grown .kk-bar { transform: none; transition: none; }
+  }
+
   /* ── VIEW TRANSITIONS: entering a guild ──
      The guild page dissolves in over the home as one piece (backdrop and glass panels rendered
      together, so the frosted glass never switches style mid-way), with a slight push-in; the
@@ -821,6 +950,33 @@
     <a href="#guilde-9" data-guild="valhalla" style="--accent:#50d080">Valhalla</a>
     <a href="#guilde-10" data-guild="ascension" style="--accent:#7aaac8">Ascension</a>
   </nav>
+
+  <div class="view-toggle" role="group" aria-label="Show the guilds as">
+    <div class="view-toggle-inner">
+      <span class="view-toggle-thumb" aria-hidden="true"></span>
+      <button type="button" data-view-btn="map" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><ellipse cx="12" cy="12" rx="9.5" ry="4.2" transform="rotate(-18 12 12)"/></svg>Galaxy map</button>
+      <button type="button" data-view-btn="list" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M8 6h12M8 12h12M8 18h12"/><circle cx="4" cy="6" r="1"/><circle cx="4" cy="12" r="1"/><circle cx="4" cy="18" r="1"/></svg>List</button>
+    </div>
+  </div>
+
+  <section class="galaxy" id="galaxy" aria-label="Galaxy map of the alliance">
+    <div class="galaxy-stage" data-galaxy-stage>
+      <canvas data-galaxy-canvas aria-hidden="true"></canvas>
+      <div class="galaxy-labels">
+        <a class="planet-label" href="#/nordic-kingdom" data-guild="nordic-kingdom" style="--accent:#ff5f5f"><b>Nordic Kingdom</b><span>Coruscant</span></a>
+        <a class="planet-label" href="#/kinderkarten" data-guild="kinderkarten" style="--accent:#59e07a"><b>Kinderkarten</b><span>Kashyyyk</span></a>
+        <a class="planet-label" href="#/rohan" data-guild="rohan" style="--accent:#f0cc3a"><b>Raiders of Rohan</b><span>Naboo</span></a>
+        <a class="planet-label" href="#/trayus" data-guild="trayus" style="--accent:#b47cff"><b>Trayus Core</b><span>Malachor</span></a>
+        <a class="planet-label" href="#/susilauma" data-guild="susilauma" style="--accent:#eef3ff"><b>Susilauma</b><span>Lothal</span></a>
+        <a class="planet-label" href="#/lightsabers" data-guild="lightsabers" style="--accent:#4aa8ff"><b>Lightsabers</b><span>Ilum</span></a>
+        <a class="planet-label" href="#/wanhusten" data-guild="wanhusten" style="--accent:#ec8fdc"><b>Wanhusten Kilta</b><span>Mandalore</span></a>
+        <a class="planet-label" href="#/filthyjawas" data-guild="filthyjawas" style="--accent:#e09a4a"><b>FilthyJawas</b><span>Tatooine</span></a>
+        <a class="planet-label" href="#/valhalla" data-guild="valhalla" style="--accent:#6ff0a0"><b>Valhalla</b><span>Hoth</span></a>
+        <a class="planet-label" href="#/ascension" data-guild="ascension" style="--accent:#9cd0ee"><b>Ascension</b><span>Bespin</span></a>
+      </div>
+    </div>
+    <p class="galaxy-hint">Each guild is a world. Select one to open its page.</p>
+  </section>
 
   <main>
 
@@ -949,6 +1105,149 @@
 
   </main>
 
+  <section class="story" id="story" aria-labelledby="story-title">
+    <div class="story-head">
+      <h2 class="story-title" id="story-title">Our story</h2>
+      <p class="story-lead">From one guild in 2016 to an alliance of ten. The dates come from the histories written by each guild.</p>
+    </div>
+    <div class="tl-wrap" data-tl>
+      <div class="tl-line" aria-hidden="true"><span class="tl-fill" data-tl-fill></span></div>
+      <ol class="tl">
+      <li class="tl-item" data-guild="nordic-kingdom" style="--accent:#e03030">
+        <span class="tl-node" aria-hidden="true"></span>
+        <div class="tl-card">
+          <time class="tl-date" datetime="2016">2016</time>
+          <h3>Nordic Kingdom is founded</h3>
+          <p>The guild is created when guilds arrive in the game. Pormestarix soon takes the lead.</p>
+          <span class="tl-chip"><img src="images/icon-nordic-kingdom.png" alt="" style="width:28px;height:28px;filter:invert(1) sepia(1) saturate(8) hue-rotate(330deg) brightness(0.6) drop-shadow(0 0 2px rgba(220,30,30,0.8));opacity:0.95;">Nordic Kingdom</span>
+        </div>
+      </li>
+      <li class="tl-item" data-guild="nordic-kingdom" style="--accent:#e03030">
+        <span class="tl-node" aria-hidden="true"></span>
+        <div class="tl-card">
+          <time class="tl-date" datetime="2017-02">February 2017</time>
+          <h3>The NoK Discord server opens</h3>
+          <p>A small gathering place for a handful of people in the guild.</p>
+          <span class="tl-chip"><img src="images/icon-nordic-kingdom.png" alt="" style="width:28px;height:28px;filter:invert(1) sepia(1) saturate(8) hue-rotate(330deg) brightness(0.6) drop-shadow(0 0 2px rgba(220,30,30,0.8));opacity:0.95;">Nordic Kingdom</span>
+        </div>
+      </li>
+      <li class="tl-item is-major" data-guild="kinderkarten" style="--accent:#2a8a3a">
+        <span class="tl-node" aria-hidden="true"></span>
+        <div class="tl-card">
+          <time class="tl-date" datetime="2017-08">August 2017</time>
+          <h3>Kinderkarten is founded: the alliance is born</h3>
+          <p>A second guild for alts and players who need a calmer pace, led by PormestariX and his son Tofi.</p>
+          <span class="tl-chip"><img src="images/icon-kinderkarten.svg" alt="" style="height:28px;width:auto;position:relative;">Kinderkarten</span>
+        </div>
+      </li>
+      <li class="tl-item" data-guild="nordic-kingdom" style="--accent:#e03030">
+        <span class="tl-node" aria-hidden="true"></span>
+        <div class="tl-card">
+          <time class="tl-date" datetime="2018-12-02">2 December 2018</time>
+          <h3>The Suomi SWGOH server</h3>
+          <p>Opened to gather Finnish guilds and talk about a closer alliance.</p>
+          <span class="tl-chip"><img src="images/icon-nordic-kingdom.png" alt="" style="width:28px;height:28px;filter:invert(1) sepia(1) saturate(8) hue-rotate(330deg) brightness(0.6) drop-shadow(0 0 2px rgba(220,30,30,0.8));opacity:0.95;">Nordic Kingdom</span>
+        </div>
+      </li>
+      <li class="tl-item" data-guild="lightsabers" style="--accent:#1080f0">
+        <span class="tl-node" aria-hidden="true"></span>
+        <div class="tl-card">
+          <time class="tl-date" datetime="2019-05-09">9 May 2019</time>
+          <h3>Lightsabers joins</h3>
+          <p>The Swedish Northern Lightsabers become Nordic Kingdom Lightsabers.</p>
+          <span class="tl-chip"><img src="images/icon-lightsabers.png" alt="" style="width:28px;height:28px;filter:hue-rotate(200deg) saturate(2) brightness(1.2);opacity:0.95;">Lightsabers</span>
+        </div>
+      </li>
+      <li class="tl-item" data-guild="rohan" style="--accent:#e8c020">
+        <span class="tl-node" aria-hidden="true"></span>
+        <div class="tl-card">
+          <time class="tl-date" datetime="2019-05-22">22 May 2019</time>
+          <h3>Raiders of Rohan joins</h3>
+          <p>One of the first guilds to join the alliance.</p>
+          <span class="tl-chip"><img src="images/icon-rohan.png" alt="" style="width:28px;height:28px;filter:invert(1) sepia(1) saturate(6) hue-rotate(5deg) brightness(0.85) drop-shadow(0 0 2px rgba(220,180,20,0.7));opacity:0.95;">Raiders of Rohan</span>
+        </div>
+      </li>
+      <li class="tl-item" data-guild="nordic-kingdom" style="--accent:#e03030">
+        <span class="tl-node" aria-hidden="true"></span>
+        <div class="tl-card">
+          <time class="tl-date" datetime="2019-07-22">22 July 2019</time>
+          <h3>S5C2H becomes Guild Leader of NoK Main</h3>
+          <p>He later takes the Alliance Leader role.</p>
+          <span class="tl-chip"><img src="images/icon-nordic-kingdom.png" alt="" style="width:28px;height:28px;filter:invert(1) sepia(1) saturate(8) hue-rotate(330deg) brightness(0.6) drop-shadow(0 0 2px rgba(220,30,30,0.8));opacity:0.95;">Nordic Kingdom</span>
+        </div>
+      </li>
+      <li class="tl-item" data-guild="nordic-kingdom" style="--accent:#e03030">
+        <span class="tl-node" aria-hidden="true"></span>
+        <div class="tl-card">
+          <time class="tl-date" datetime="2019-08">August 2019</time>
+          <h3>The first counterlist</h3>
+          <p>Every counter tested within NoK Main. It brings the alliance its widest international fame.</p>
+          <span class="tl-chip"><img src="images/icon-nordic-kingdom.png" alt="" style="width:28px;height:28px;filter:invert(1) sepia(1) saturate(8) hue-rotate(330deg) brightness(0.6) drop-shadow(0 0 2px rgba(220,30,30,0.8));opacity:0.95;">Nordic Kingdom</span>
+        </div>
+      </li>
+      <li class="tl-item" data-guild="valhalla" style="--accent:#50d080">
+        <span class="tl-node" aria-hidden="true"></span>
+        <div class="tl-card">
+          <time class="tl-date" datetime="2019-08-24">24 August 2019</time>
+          <h3>Valhalla joins</h3>
+          <p>Originally made as a guild for retiring players.</p>
+          <span class="tl-chip"><img src="images/icon-valhalla.png" alt="" style="width:28px;height:28px;filter:invert(1) sepia(1) saturate(4) hue-rotate(90deg) brightness(0.6) drop-shadow(0 0 2px rgba(50,180,90,0.8));opacity:0.95;">Valhalla</span>
+        </div>
+      </li>
+      <li class="tl-item" data-guild="trayus" style="--accent:#8030d0">
+        <span class="tl-node" aria-hidden="true"></span>
+        <div class="tl-card">
+          <time class="tl-date" datetime="2020-05">May 2020</time>
+          <h3>Trayus Core joins</h3>
+          <span class="tl-chip"><img src="images/icon-trayus.png" alt="" style="width:28px;height:28px;filter:invert(1) sepia(1) saturate(5) hue-rotate(260deg) brightness(0.7) drop-shadow(0 0 2px rgba(120,40,200,0.8));opacity:0.95;">Trayus Core</span>
+        </div>
+      </li>
+      <li class="tl-item" data-guild="ascension" style="--accent:#7aaac8">
+        <span class="tl-node" aria-hidden="true"></span>
+        <div class="tl-card">
+          <time class="tl-date" datetime="2020-09-04">4 September 2020</time>
+          <h3>Ascension is founded</h3>
+          <p>The starter guild for new players.</p>
+          <span class="tl-chip"><img src="images/icon-ascension.png" alt="" style="width:28px;height:28px;filter:sepia(1) saturate(3) hue-rotate(175deg) brightness(0.75) drop-shadow(0 0 2px rgba(100,160,200,0.8));opacity:0.95;">Ascension</span>
+        </div>
+      </li>
+      <li class="tl-item" data-guild="wanhusten" style="--accent:#d070c0">
+        <span class="tl-node" aria-hidden="true"></span>
+        <div class="tl-card">
+          <time class="tl-date" datetime="2021-04">April 2021</time>
+          <h3>Wanhusten Kilta joins</h3>
+          <span class="tl-chip"><img src="images/icon-wanhusten.png" alt="" style="width:28px;height:28px;filter:invert(1) sepia(1) saturate(4) hue-rotate(280deg) brightness(0.85) drop-shadow(0 0 2px rgba(200,80,180,0.6));opacity:0.95;">Wanhusten Kilta</span>
+        </div>
+      </li>
+      <li class="tl-item" data-guild="susilauma" style="--accent:#ffffff">
+        <span class="tl-node" aria-hidden="true"></span>
+        <div class="tl-card">
+          <time class="tl-date" datetime="2021-05">May 2021</time>
+          <h3>Susilauma joins</h3>
+          <span class="tl-chip"><img src="images/icon-susilauma.png" alt="" style="width:28px;height:28px;filter:brightness(0) drop-shadow(0 0 1px rgba(255,255,255,0.9)) drop-shadow(0 0 2px rgba(255,255,255,0.5));opacity:1;">Susilauma</span>
+        </div>
+      </li>
+      <li class="tl-item" data-guild="filthyjawas" style="--accent:#a06030">
+        <span class="tl-node" aria-hidden="true"></span>
+        <div class="tl-card">
+          <time class="tl-date" datetime="2026-03-09">9 March 2026</time>
+          <h3>FilthyJawas joins</h3>
+          <span class="tl-chip"><img src="images/icon-filthyjawas.png" alt="" style="width:28px;height:28px;filter:sepia(1) saturate(6) hue-rotate(5deg) brightness(1.1) contrast(1.6) drop-shadow(0 0 3px rgba(80,35,5,0.95));opacity:0.95;">FilthyJawas</span>
+        </div>
+      </li>
+      <li class="tl-item is-major" data-guild="nordic-kingdom" style="--accent:#e03030">
+        <span class="tl-node" aria-hidden="true"></span>
+        <div class="tl-card">
+          <time class="tl-date" datetime="2026">2026</time>
+          <h3>Ten years of Nordic Kingdom</h3>
+          <p>Ten guilds, one alliance. Still here after ten years.</p>
+          <span class="tl-chip"><img src="images/icon-nordic-kingdom.png" alt="" style="width:28px;height:28px;filter:invert(1) sepia(1) saturate(8) hue-rotate(330deg) brightness(0.6) drop-shadow(0 0 2px rgba(220,30,30,0.8));opacity:0.95;">Nordic Kingdom</span>
+        </div>
+      </li>
+      </ol>
+    </div>
+  </section>
+
   <footer>
     <p>Nordic Kingdom &nbsp;·&nbsp; Star Wars Galaxy of Heroes &nbsp;·&nbsp; Guild Alliance</p>
     <p class="footer-credit">Crafted with care by <span>Wali</span> &nbsp;·&nbsp; Kinderkarten Leader</p>
@@ -992,6 +1291,41 @@
         </a>
       </div>
     </div>
+    <section class="gp-body kk-tl" aria-labelledby="kk-tl-title" data-kk-tl data-start="2017-08-01">
+      <h2 class="gp-history-label" id="kk-tl-title">Leaders through the years</h2>
+      <div class="kk-axis" aria-hidden="true" data-kk-axis><span class="kk-tick" style="left:4.50%">2018</span><span class="kk-tick" style="left:15.25%">2019</span><span class="kk-tick" style="left:25.99%">2020</span><span class="kk-tick" style="left:36.77%">2021</span><span class="kk-tick" style="left:47.51%">2022</span><span class="kk-tick" style="left:58.26%">2023</span><span class="kk-tick" style="left:69.00%">2024</span><span class="kk-tick" style="left:79.78%">2025</span><span class="kk-tick" style="left:90.52%">2026</span></div>
+      <ol class="kk-rows" style="--years:10">
+      <li class="kk-row" style="--s:0.00%;--e:13.57%;--d:0ms">
+        <span class="kk-name">PormestariX & Tofi<small>co-leaders · 08/2017 – 05/11/2018</small></span>
+        <span class="kk-track" aria-hidden="true"><span class="kk-bar"></span></span>
+      </li>
+      <li class="kk-row" style="--s:13.45%;--e:17.90%;--d:90ms">
+        <span class="kk-name">CaptainSalsaFingers<small>11/2018 – 04/2019</small></span>
+        <span class="kk-track" aria-hidden="true"><span class="kk-bar"></span></span>
+      </li>
+      <li class="kk-row" style="--s:17.90%;--e:45.86%;--d:180ms">
+        <span class="kk-name">DrSiwakov<small>1st term · 04/2019 – 06/11/2021</small></span>
+        <span class="kk-track" aria-hidden="true"><span class="kk-bar"></span></span>
+      </li>
+      <li class="kk-row" style="--s:45.86%;--e:52.28%;--d:270ms">
+        <span class="kk-name">Yoda<small>06/11/2021 – 12/06/2022</small></span>
+        <span class="kk-track" aria-hidden="true"><span class="kk-bar"></span></span>
+      </li>
+      <li class="kk-row" style="--s:52.28%;--e:54.75%;--d:360ms">
+        <span class="kk-name">DrSiwakov<small>2nd term · 12/06/2022 – 04/09/2022</small></span>
+        <span class="kk-track" aria-hidden="true"><span class="kk-bar"></span></span>
+      </li>
+      <li class="kk-row" style="--s:54.75%;--e:64.44%;--d:450ms">
+        <span class="kk-name">Huno<small>04/09/2022 – 30/07/2023</small></span>
+        <span class="kk-track" aria-hidden="true"><span class="kk-bar"></span></span>
+      </li>
+      <li class="kk-row is-current" style="--s:64.44%;--e:100.00%;--d:540ms" data-current>
+        <span class="kk-name">Wali<small>current leader · 30/07/2023 – today</small></span>
+        <span class="kk-track" aria-hidden="true"><span class="kk-bar"></span></span>
+      </li>
+      </ol>
+      <p class="kk-born">August 2017: Kinderkarten is founded, and with it the Nordic Kingdom alliance.</p>
+    </section>
     <div class="gp-body" style="background:linear-gradient(to right,rgba(2,4,15,0.35) 0%,rgba(2,4,15,0.78) 30%,rgba(2,4,15,0.85) 50%,rgba(2,4,15,0.78) 70%,rgba(2,4,15,0.35) 100%);">
       <div class="gp-recruiter">
         <span class="gp-recruiter-label">
@@ -1924,7 +2258,8 @@ const router = (function() {
         || page.querySelector('.gp-back');
       target?.focus({ preventScroll: true });
     } else if (prev) {
-      cardOf(prev)?.querySelector('.gc-link')?.focus({ preventScroll: true });
+      const label = window.guildsView && guildsView.isMap() ? guildsView.labelFor(prev) : null;
+      (label || cardOf(prev)?.querySelector('.gc-link'))?.focus({ preventScroll: true });
     }
   }
 
@@ -2077,9 +2412,135 @@ document.querySelectorAll('.guild-page').forEach(page => {
   }, { passive: true });
 });
 
+/* ── GUILDS VIEW: galaxy map / list ── */
+var guildsView = window.guildsView = (function() {
+  const root = document.documentElement;
+  const stage = document.querySelector('[data-galaxy-stage]');
+  const toggle = document.querySelector('.view-toggle');
+  if (!stage || !toggle) return { isMap: () => false, focus() {}, labelFor: () => null };
+  const thumb = toggle.querySelector('.view-toggle-thumb');
+  const buttons = [...toggle.querySelectorAll('[data-view-btn]')];
+  const labels = new Map([...stage.querySelectorAll('.planet-label')].map(l => [l.dataset.guild, l]));
+  const GUILDS = [
+  { id: 'nordic-kingdom', tint: '#ff5f5f', type: 3, radius: 1.4, orbit: 0.0, speed: 0.0, phase: 0.0 },
+  { id: 'kinderkarten', tint: '#59e07a', type: 0, radius: 0.82, orbit: 5.0, speed: 0.05, phase: 0.0 },
+  { id: 'rohan', tint: '#f0cc3a', type: 4, radius: 0.78, orbit: 7.4, speed: 0.034, phase: 0.79 },
+  { id: 'trayus', tint: '#b47cff', type: 2, radius: 0.68, orbit: 5.0, speed: 0.05, phase: 1.57 },
+  { id: 'susilauma', tint: '#eef3ff', type: 5, radius: 0.74, orbit: 7.4, speed: 0.034, phase: 2.36 },
+  { id: 'lightsabers', tint: '#4aa8ff', type: 6, radius: 0.68, orbit: 5.0, speed: 0.05, phase: 3.14 },
+  { id: 'wanhusten', tint: '#ec8fdc', type: 7, radius: 0.74, orbit: 7.4, speed: 0.034, phase: 3.93 },
+  { id: 'filthyjawas', tint: '#e09a4a', type: 1, radius: 0.74, orbit: 5.0, speed: 0.05, phase: 4.71 },
+  { id: 'valhalla', tint: '#6ff0a0', type: 8, radius: 0.78, orbit: 7.4, speed: 0.034, phase: 5.5 },
+  { id: 'ascension', tint: '#9cd0ee', type: 9, radius: 0.95, orbit: 9.4, speed: 0.024, phase: 1.1 }
+  ];
+  let map = null, loading = null, failed = false;
+
+  const loadScript = src => new Promise((resolve, reject) => {
+    const s = document.createElement('script'); s.src = src; s.onload = resolve; s.onerror = reject; document.head.appendChild(s);
+  });
+  function moveThumb() {
+    const on = buttons.find(b => b.getAttribute('aria-pressed') === 'true');
+    if (!on) return;
+    thumb.style.width = on.offsetWidth + 'px';
+    thumb.style.transform = `translateX(${on.offsetLeft - 4}px)`;
+  }
+  function ensureMap() {
+    if (map || failed) return Promise.resolve(map);
+    if (loading) return loading;
+    loading = (window.THREE ? Promise.resolve() : loadScript('vendor/three.min.js'))
+      .then(() => window.NKGalaxy ? null : loadScript('galaxy.js'))
+      .then(() => {
+        map = window.NKGalaxy.create({
+          canvas: stage.querySelector('[data-galaxy-canvas]'), stage, labels, guilds: GUILDS, reduceMotion,
+          isPaused: () => root.classList.contains('page-open') || root.dataset.view !== 'map',
+          onHover: id => {
+            labels.forEach((l, k) => l.classList.toggle('is-hot', k === id));
+            if (!canHover.matches || reduceMotion.matches) return;
+            const card = id && document.querySelector(`.guild-card[data-guild="${id}"]`);
+            preview.schedule(card ? card.dataset.bg : null, card ? 140 : 220);
+          },
+        });
+        if (!map) throw new Error('webgl');
+        requestAnimationFrame(() => stage.classList.add('is-live'));
+        return map;
+      })
+      .catch(() => { failed = true; toggle.hidden = true; setView('list', false); return null; });
+    return loading;
+  }
+  function setView(v, persist) {
+    root.dataset.view = v;
+    buttons.forEach(b => b.setAttribute('aria-pressed', String(b.dataset.viewBtn === v)));
+    moveThumb();
+    if (persist) { try { localStorage.setItem('nk-view', v); } catch (e) {} }
+    if (v === 'map') { ensureMap().then(m => m && m.resize()); }
+    else preview.schedule(null, 0);
+  }
+  buttons.forEach(b => b.addEventListener('click', () => setView(b.dataset.viewBtn, true)));
+  labels.forEach((l, id) => {
+    l.addEventListener('pointerenter', e => { if (e.pointerType === 'mouse' && map) map.setHover(id); });
+    l.addEventListener('pointerleave', e => { if (e.pointerType === 'mouse' && map) map.setHover(null); });
+    l.addEventListener('focus', () => { if (map) map.setFocus(id); l.classList.add('is-hot'); });
+    l.addEventListener('blur', () => { if (map) map.setFocus(null); l.classList.remove('is-hot'); });
+  });
+  addEventListener('resize', moveThumb);
+  if (document.fonts) document.fonts.ready.then(moveThumb);
+  setView(root.dataset.view === 'map' ? 'map' : 'list', false);
+
+  return {
+    isMap: () => root.dataset.view === 'map' && !failed,
+    labelFor: id => labels.get(id) || null,
+    focus(id) {
+      stage.scrollIntoView({ behavior: reduceMotion.matches ? 'auto' : 'smooth', block: 'center' });
+      if (map) map.pulse(id);
+      labels.get(id)?.focus({ preventScroll: true });
+    },
+  };
+})();
+
+/* ── OUR STORY: the line draws with the scroll, each event lights up when it is reached ── */
+(function() {
+  const list = document.querySelector('[data-tl]');
+  if (!list) return;
+  const fill = list.querySelector('[data-tl-fill]');
+  const items = [...list.querySelectorAll('.tl-item')];
+  let ticking = false;
+  function update() {
+    ticking = false;
+    if (reduceMotion.matches) { fill.style.setProperty('--p', 1); items.forEach(i => i.classList.add('is-reached')); return; }
+    const r = list.getBoundingClientRect();
+    const mark = innerHeight * 0.62;
+    const p = Math.min(1, Math.max(0, (mark - r.top) / r.height));
+    fill.style.setProperty('--p', p.toFixed(4));
+    items.forEach(i => { const n = i.querySelector('.tl-node').getBoundingClientRect(); i.classList.toggle('is-reached', n.top + n.height / 2 <= mark); });
+  }
+  const onScroll = () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } };
+  addEventListener('scroll', onScroll, { passive: true });
+  addEventListener('resize', onScroll);
+  reduceMotion.addEventListener('change', onScroll);
+  update();
+})();
+
+/* ── KINDERKARTEN: leader bars grow once, in order, when the timeline comes into view ── */
+(function() {
+  const tl = document.querySelector('[data-kk-tl]');
+  if (!tl) return;
+  // the current leader's bar runs to today
+  const cur = tl.querySelector('[data-current]');
+  if (cur) cur.style.setProperty('--e', '100%');
+  if (reduceMotion.matches || !('IntersectionObserver' in window)) return;
+  tl.classList.add('will-grow');
+  const page = tl.closest('.guild-page');
+  const io = new IntersectionObserver(es => {
+    if (!es.some(e => e.isIntersecting)) return;
+    tl.classList.add('is-grown'); tl.classList.remove('will-grow'); io.disconnect();
+  }, { root: page, threshold: 0.35 });
+  io.observe(tl);
+})();
+
 /* ── GUILD NAV: smooth scroll + highlight the target card ── */
 document.querySelectorAll('nav.guild-nav a').forEach(link => {
   link.addEventListener('click', e => {
+    if (guildsView.isMap()) { e.preventDefault(); guildsView.focus(link.dataset.guild); return; }
     const target = document.querySelector(link.getAttribute('href'));
     if (!target) return;
     e.preventDefault();
