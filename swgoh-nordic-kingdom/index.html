@@ -573,8 +573,9 @@
   /* Fallback page transitions (browsers without View Transitions) */
   @keyframes page-fade-in  { from { opacity: 0; } to { opacity: 1; } }
   @keyframes page-fade-out { from { opacity: 1; } to { opacity: 0; } }
-  .guild-page.fallback-in  { animation: page-fade-in 420ms var(--ease-out) both; }
-  .guild-page.fallback-out { animation: page-fade-out 300ms var(--ease-out) both; }
+  /* Phones (and browsers without View Transitions): one even fade of the whole page */
+  .guild-page.fallback-in  { animation: page-fade-in 520ms cubic-bezier(0.33, 0, 0.2, 1) both; }
+  .guild-page.fallback-out { animation: page-fade-out 320ms cubic-bezier(0.33, 0, 0.2, 1) both; }
 
   .gp-header { text-align: center; margin-bottom: 48px; }
   .gp-label { font-family: 'Orbitron', monospace; font-size: 0.66rem; letter-spacing: 0.4em; color: var(--cyan); text-transform: uppercase; margin-bottom: 10px; }
@@ -787,9 +788,9 @@
     .tl-node { grid-column: 1; }
     .tl-item:nth-child(odd) .tl-card, .tl-item:nth-child(even) .tl-card { grid-column: 2; text-align: left; }
     .story-head { margin-bottom: 36px; }
-    .galaxy-stage { height: clamp(440px, 64vh, 560px); }
-    .planet-label { padding: 3px 6px; background: rgba(2,4,15,0.55); }
-    .planet-label b { font-size: 0.56rem; letter-spacing: 0.06em; }
+    .galaxy-stage { height: clamp(560px, 84svh, 780px); }
+    .planet-label { padding: 4px 8px; background: rgba(2,4,15,0.62); }
+    .planet-label b { font-size: 0.58rem; letter-spacing: 0.05em; }
   }
   @media (prefers-reduced-motion: reduce) {
     .view-toggle-thumb, .galaxy-stage, .tl-node, .tl-card { transition: none; }
@@ -2267,7 +2268,8 @@ const router = (function() {
       return;
     }
 
-    if (document.startViewTransition) {
+    // View Transitions only where they behave (mouse devices); phones get the plain fade below, fully under our control
+    if (document.startViewTransition && canHover.matches) {
       const forward = !!next && !prev;
       const full = !reduceMotion.matches && (forward || (!next && prev));
       root.dataset.nav = next ? 'forward' : 'back';

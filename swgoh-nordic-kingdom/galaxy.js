@@ -183,6 +183,8 @@
     });
 
     let width = 1, height = 1, hovered = null, focusId = null, pulse = { id: null, t: 0 };
+    const coarse = window.matchMedia('(pointer: coarse)').matches;
+    let sizeK = 1;
     function resize() {
       const r = opts.stage.getBoundingClientRect();
       width = Math.max(1, r.width); height = Math.max(1, r.height);
@@ -191,15 +193,18 @@
       const narrow = width < 640;
       // wide screens: a low, cinematic angle on the orbital plane; phones: seen from above so the orbits fill the height
       camera.fov = narrow ? 46 : 34;
-      if (narrow) { camera.position.set(0, 17, 6.5); camera.lookAt(0, 0, 1.3); }
+      // phones: seen from almost straight above, turned a quarter so the orbits run along the tall screen
+      system.rotation.y = narrow ? Math.PI / 2 : 0;
+      sizeK = narrow ? 1.55 : 1;   // bigger worlds on phones: easier to see and to tap
+      if (narrow) { camera.position.set(0, 21, 3.2); camera.lookAt(0, 0, 0.4); }
       else { camera.position.set(0, 11, 12.5); camera.lookAt(0, -0.6, 0.6); }
       camera.updateProjectionMatrix();
       camera.updateMatrixWorld();
-      fit(narrow ? 0.8 : 1);
+      fit(narrow ? 1.25 : 1, narrow ? 0.93 : 0.9);
     }
     // Scale the system so the widest orbit (planet and halo included) always stays inside the frame
     const outer = opts.guilds.reduce((m, g) => Math.max(m, g.orbit + g.radius * 1.8), 0);
-    function fit(base) {
+    function fit(base, maxY) {
       let s = base;
       const v = new THREE.Vector3();
       for (let pass = 0; pass < 3; pass++) {
@@ -210,7 +215,7 @@
           v.set(Math.cos(a) * outer, 0, Math.sin(a) * outer * 0.58).applyMatrix4(system.matrixWorld).project(camera);
           mx = Math.max(mx, Math.abs(v.x)); my = Math.max(my, Math.abs(v.y));
         }
-        const k = Math.min(1, 0.94 / mx, 0.9 / my);
+        const k = Math.min(1, 0.94 / mx, maxY / my);
         if (k > 0.995) break;
         s *= k;
       }
@@ -225,7 +230,7 @@
       let best = null, bd = Infinity;
       planets.forEach(p => {
         const dx = x - p.screen.x, dy = y - p.screen.y; const d = Math.hypot(dx, dy);
-        const hit = Math.max(p.screen.r * 1.15, 22);
+        const hit = coarse ? Math.max(p.screen.r * 1.7, 34) : Math.max(p.screen.r * 1.15, 22);
         if (d < hit && p.screen.z < bd) { bd = p.screen.z; best = p; }
       });
       return best;
@@ -250,6 +255,7 @@
     });
 
     let last = performance.now(), time = 0, running = true, visible = true;
+    const orbitPace = coarse ? 0.35 : 1;   // slower orbits on touch screens: a planet should not slip away from a finger
     const v = new THREE.Vector3();
     function frame(now) {
       if (!running) return;
@@ -257,7 +263,7 @@
       const dt = Math.min(0.05, (now - last) / 1000); last = now;
       if (!visible || document.hidden || (opts.isPaused && opts.isPaused())) return;
       const still = opts.reduceMotion.matches;
-      if (!still) time += dt;
+      if (!still) time += dt * orbitPace;
       planets.forEach(p => {
         const g = p.g;
         const ang = g.phase + (still ? 0 : time * g.speed);
@@ -267,7 +273,7 @@
         p.hover += (p.target - p.hover) * (still ? 1 : 1 - Math.exp(-dt * 10));
         let pulseK = 0;
         if (pulse.id === g.id) { pulse.t += dt; pulseK = Math.max(0, 1 - pulse.t / 1.2) * Math.sin(Math.min(1, pulse.t / 1.2) * Math.PI); if (pulse.t > 1.2) pulse.id = null; }
-        const s = g.radius * (1 + p.hover * 0.14 + pulseK * 0.12);
+        const s = g.radius * sizeK * (1 + p.hover * 0.14 + pulseK * 0.12);
         p.body.scale.setScalar(s);
         p.halo.scale.setScalar(s * 3.36);
         p.halo.material.opacity = 0.4 + p.hover * 0.35 + pulseK * 0.4;
