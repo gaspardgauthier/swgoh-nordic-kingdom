@@ -191,9 +191,30 @@
       const narrow = width < 640;
       // wide screens: a low, cinematic angle on the orbital plane; phones: seen from above so the orbits fill the height
       camera.fov = narrow ? 46 : 34;
-      if (narrow) { camera.position.set(0, 17, 6.5); system.scale.setScalar(0.8); camera.lookAt(0, 0, 1.3); }
-      else { camera.position.set(0, 11, 12.5); system.scale.setScalar(1); camera.lookAt(0, -0.6, 0.6); }
+      if (narrow) { camera.position.set(0, 17, 6.5); camera.lookAt(0, 0, 1.3); }
+      else { camera.position.set(0, 11, 12.5); camera.lookAt(0, -0.6, 0.6); }
       camera.updateProjectionMatrix();
+      camera.updateMatrixWorld();
+      fit(narrow ? 0.8 : 1);
+    }
+    // Scale the system so the widest orbit (planet and halo included) always stays inside the frame
+    const outer = opts.guilds.reduce((m, g) => Math.max(m, g.orbit + g.radius * 1.8), 0);
+    function fit(base) {
+      let s = base;
+      const v = new THREE.Vector3();
+      for (let pass = 0; pass < 3; pass++) {
+        system.scale.setScalar(s); system.updateMatrixWorld(true);
+        let mx = 0, my = 0;
+        for (let k = 0; k < 48; k++) {
+          const a = k / 48 * Math.PI * 2;
+          v.set(Math.cos(a) * outer, 0, Math.sin(a) * outer * 0.58).applyMatrix4(system.matrixWorld).project(camera);
+          mx = Math.max(mx, Math.abs(v.x)); my = Math.max(my, Math.abs(v.y));
+        }
+        const k = Math.min(1, 0.94 / mx, 0.9 / my);
+        if (k > 0.995) break;
+        s *= k;
+      }
+      system.scale.setScalar(Math.min(base, s));
     }
     const ro = 'ResizeObserver' in window ? new ResizeObserver(resize) : null;
     if (ro) ro.observe(opts.stage); else window.addEventListener('resize', resize);
