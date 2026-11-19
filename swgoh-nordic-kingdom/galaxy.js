@@ -184,27 +184,29 @@
 
     let width = 1, height = 1, hovered = null, focusId = null, pulse = { id: null, t: 0 };
     const coarse = window.matchMedia('(pointer: coarse)').matches;
-    let sizeK = 1;
+    let sizeK = 1, orbitK = 1, flatK = 0.58;
     function resize() {
       const r = opts.stage.getBoundingClientRect();
       width = Math.max(1, r.width); height = Math.max(1, r.height);
       renderer.setSize(width, height, false);
       camera.aspect = width / height;
       const narrow = width < 640;
-      // wide screens: a low, cinematic angle on the orbital plane; phones: seen from above so the orbits fill the height
       camera.fov = narrow ? 46 : 34;
-      // phones: seen from almost straight above, turned a quarter so the orbits run along the tall screen
-      system.rotation.y = narrow ? Math.PI / 2 : 0;
-      sizeK = narrow ? 1.55 : 1;   // bigger worlds on phones: easier to see and to tap
-      if (narrow) { camera.position.set(0, 21, 3.2); camera.lookAt(0, 0, 0.4); }
+      // phones: same tilted view as before, but tighter orbits (same proportions) and bigger worlds,
+      // then the whole system is scaled up uniformly until it fills the screen width
+      sizeK = narrow ? 1.35 : 1;
+      orbitK = narrow ? 0.7 : 1;
+      flatK = narrow ? 0.95 : 0.58;   // phones: near-round orbits, so the map grows in both directions
+      planets.forEach(p => { if (p.orbitLine) p.orbitLine.scale.set(orbitK, 1, orbitK * flatK / 0.58); });
+      if (narrow) { camera.position.set(0, 17, 6.5); camera.lookAt(0, 0, 1.3); }
       else { camera.position.set(0, 11, 12.5); camera.lookAt(0, -0.6, 0.6); }
       camera.updateProjectionMatrix();
       camera.updateMatrixWorld();
-      fit(narrow ? 1.25 : 1, narrow ? 0.93 : 0.9);
+      fit(narrow ? 2 : 1, narrow ? 0.96 : 0.9, narrow ? 0.97 : 0.94);
     }
     // Scale the system so the widest orbit (planet and halo included) always stays inside the frame
-    const outer = opts.guilds.reduce((m, g) => Math.max(m, g.orbit + g.radius * 1.8), 0);
-    function fit(base, maxY) {
+    function fit(base, maxY, maxX) {
+      const outer = opts.guilds.reduce((m, g) => Math.max(m, g.orbit * orbitK + g.radius * sizeK * 1.08), 0);
       let s = base;
       const v = new THREE.Vector3();
       for (let pass = 0; pass < 3; pass++) {
@@ -212,10 +214,10 @@
         let mx = 0, my = 0;
         for (let k = 0; k < 48; k++) {
           const a = k / 48 * Math.PI * 2;
-          v.set(Math.cos(a) * outer, 0, Math.sin(a) * outer * 0.58).applyMatrix4(system.matrixWorld).project(camera);
+          v.set(Math.cos(a) * outer, 0, Math.sin(a) * outer * flatK).applyMatrix4(system.matrixWorld).project(camera);
           mx = Math.max(mx, Math.abs(v.x)); my = Math.max(my, Math.abs(v.y));
         }
-        const k = Math.min(1, 0.94 / mx, maxY / my);
+        const k = Math.min(1, maxX / mx, maxY / my);
         if (k > 0.995) break;
         s *= k;
       }
@@ -230,8 +232,9 @@
       let best = null, bd = Infinity;
       planets.forEach(p => {
         const dx = x - p.screen.x, dy = y - p.screen.y; const d = Math.hypot(dx, dy);
-        const hit = coarse ? Math.max(p.screen.r * 1.7, 34) : Math.max(p.screen.r * 1.15, 22);
-        if (d < hit && p.screen.z < bd) { bd = p.screen.z; best = p; }
+        const hit = coarse ? Math.max(p.screen.r * 1.5, 30) : Math.max(p.screen.r * 1.15, 22);
+        const score = d / hit;
+        if (score < 1 && score < bd) { bd = score; best = p; }
       });
       return best;
     }
@@ -267,7 +270,8 @@
       planets.forEach(p => {
         const g = p.g;
         const ang = g.phase + (still ? 0 : time * g.speed);
-        p.pivot.position.set(Math.cos(ang) * g.orbit, Math.sin(ang * 0.7 + g.phase) * 0.12 * (g.orbit ? 1 : 0), Math.sin(ang) * g.orbit * 0.58);
+        const R = g.orbit * orbitK;
+        p.pivot.position.set(Math.cos(ang) * R, Math.sin(ang * 0.7 + g.phase) * 0.12 * (g.orbit ? 1 : 0), Math.sin(ang) * R * flatK);
         if (!still) p.body.rotation.y += dt * (0.12 + 0.1 / g.radius);
         p.target = (hovered === g.id || focusId === g.id) ? 1 : 0;
         p.hover += (p.target - p.hover) * (still ? 1 : 1 - Math.exp(-dt * 10));
