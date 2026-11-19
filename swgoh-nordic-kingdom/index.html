@@ -8,7 +8,7 @@
 <link rel="icon" type="image/png" href="images/icon-nordic-kingdom.png">
 <meta name="description" content="Nordic Kingdom — a 10-guild alliance in Star Wars: Galaxy of Heroes. Guild histories, leaders and recruitment.">
 <script>document.documentElement.classList.add('js');</script>
-<script>(function(){var v;try{v=localStorage.getItem('nk-view')}catch(e){}if(v!=='map'&&v!=='list'){v=matchMedia('(min-width: 900px) and (hover: hover) and (pointer: fine)').matches?'map':'list'}document.documentElement.dataset.view=v})();</script>
+<script>(function(){var v;try{v=localStorage.getItem('nk-view')}catch(e){}if(v!=='map'&&v!=='list'){v='map'}document.documentElement.dataset.view=v})();</script>
 <style>
   @font-face { font-family: 'Nordvik'; src: url('fonts/nordvik.ttf') format('truetype'); font-display: swap; }
   @font-face { font-family: 'GreekFreak'; src: url('fonts/greekfreak.ttf') format('truetype'); font-display: swap; }
@@ -739,7 +739,6 @@
   }
   .galaxy-stage.is-live .planet-label { opacity: 1; }
   .planet-label b { font-family: 'Orbitron', monospace; font-size: 0.64rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
-  .planet-label span { font-size: 0.7rem; letter-spacing: 0.08em; color: var(--accent); }
   .planet-label.is-hot, .planet-label:focus-visible { background: rgba(2,4,15,0.78); border-color: color-mix(in srgb, var(--accent) 70%, transparent); outline: none; }
   .galaxy-hint { margin-top: 10px; text-align: center; font-size: 0.82rem; color: var(--text-dim); }
 
@@ -818,7 +817,6 @@
     .galaxy-stage { height: clamp(440px, 64vh, 560px); }
     .planet-label { padding: 3px 6px; background: rgba(2,4,15,0.55); }
     .planet-label b { font-size: 0.56rem; letter-spacing: 0.06em; }
-    .planet-label span { display: none; }
     .kk-tick:nth-child(even) { display: none; }
   }
   @media (prefers-reduced-motion: reduce) {
@@ -963,16 +961,16 @@
     <div class="galaxy-stage" data-galaxy-stage>
       <canvas data-galaxy-canvas aria-hidden="true"></canvas>
       <div class="galaxy-labels">
-        <a class="planet-label" href="#/nordic-kingdom" data-guild="nordic-kingdom" style="--accent:#ff5f5f"><b>Nordic Kingdom</b><span>Coruscant</span></a>
-        <a class="planet-label" href="#/kinderkarten" data-guild="kinderkarten" style="--accent:#59e07a"><b>Kinderkarten</b><span>Kashyyyk</span></a>
-        <a class="planet-label" href="#/rohan" data-guild="rohan" style="--accent:#f0cc3a"><b>Raiders of Rohan</b><span>Naboo</span></a>
-        <a class="planet-label" href="#/trayus" data-guild="trayus" style="--accent:#b47cff"><b>Trayus Core</b><span>Malachor</span></a>
-        <a class="planet-label" href="#/susilauma" data-guild="susilauma" style="--accent:#eef3ff"><b>Susilauma</b><span>Lothal</span></a>
-        <a class="planet-label" href="#/lightsabers" data-guild="lightsabers" style="--accent:#4aa8ff"><b>Lightsabers</b><span>Ilum</span></a>
-        <a class="planet-label" href="#/wanhusten" data-guild="wanhusten" style="--accent:#ec8fdc"><b>Wanhusten Kilta</b><span>Mandalore</span></a>
-        <a class="planet-label" href="#/filthyjawas" data-guild="filthyjawas" style="--accent:#e09a4a"><b>FilthyJawas</b><span>Tatooine</span></a>
-        <a class="planet-label" href="#/valhalla" data-guild="valhalla" style="--accent:#6ff0a0"><b>Valhalla</b><span>Hoth</span></a>
-        <a class="planet-label" href="#/ascension" data-guild="ascension" style="--accent:#9cd0ee"><b>Ascension</b><span>Bespin</span></a>
+        <a class="planet-label" href="#/nordic-kingdom" data-guild="nordic-kingdom" style="--accent:#ff5f5f"><b>Nordic Kingdom</b></a>
+        <a class="planet-label" href="#/kinderkarten" data-guild="kinderkarten" style="--accent:#59e07a"><b>Kinderkarten</b></a>
+        <a class="planet-label" href="#/rohan" data-guild="rohan" style="--accent:#f0cc3a"><b>Raiders of Rohan</b></a>
+        <a class="planet-label" href="#/trayus" data-guild="trayus" style="--accent:#b47cff"><b>Trayus Core</b></a>
+        <a class="planet-label" href="#/susilauma" data-guild="susilauma" style="--accent:#eef3ff"><b>Susilauma</b></a>
+        <a class="planet-label" href="#/lightsabers" data-guild="lightsabers" style="--accent:#4aa8ff"><b>Lightsabers</b></a>
+        <a class="planet-label" href="#/wanhusten" data-guild="wanhusten" style="--accent:#ec8fdc"><b>Wanhusten Kilta</b></a>
+        <a class="planet-label" href="#/filthyjawas" data-guild="filthyjawas" style="--accent:#e09a4a"><b>FilthyJawas</b></a>
+        <a class="planet-label" href="#/valhalla" data-guild="valhalla" style="--accent:#6ff0a0"><b>Valhalla</b></a>
+        <a class="planet-label" href="#/ascension" data-guild="ascension" style="--accent:#9cd0ee"><b>Ascension</b></a>
       </div>
     </div>
     <p class="galaxy-hint">Each guild is a world. Select one to open its page.</p>

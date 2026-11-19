@@ -13,7 +13,7 @@ Single-page website presenting **Nordic Kingdom**, a 10-guild alliance in *Star 
 - Links to SWGOH.GG, YouTube and Discord
 
 ## Galaxy map and timelines
-- **Galaxy map** (home page, `galaxy.js`): the ten guilds as hologram planets tinted with each guild's colour, each drawn by a shader from its Star Wars world (Coruscant, Kashyyyk, Naboo, Malachor, Lothal, Ilum, Mandalore, Tatooine, Hoth, Bespin). Hover shows the guild's background, click opens its page. A "Galaxy map / List" switch keeps the classic cards; the choice is remembered. Desktop opens on the map, phones on the list. Three.js and `galaxy.js` are only loaded when the map is shown.
+- **Galaxy map** (home page, `galaxy.js`): the ten guilds as hologram planets tinted with each guild's colour, each drawn by a shader from its Star Wars world (Coruscant, Kashyyyk, Naboo, Malachor, Lothal, Ilum, Mandalore, Tatooine, Hoth, Bespin). Hover shows the guild's background, click opens its page. A "Galaxy map / List" switch keeps the classic cards; the choice is remembered. The map is the default view on every device. Three.js and `galaxy.js` are only loaded when the map is shown.
 - **Our story** (home page): the alliance timeline; the line draws with the scroll and each event lights up when reached. Events are in `index.html` (section `#story`).
 - **Leaders through the years** (Kinderkarten page): leader terms as bars on a time axis, from the leaders table.
 
