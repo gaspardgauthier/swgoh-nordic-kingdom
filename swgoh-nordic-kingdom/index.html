@@ -568,7 +568,7 @@
   /* Content entrance when a guild page opens.
      Lead: the guild name. Support: motto, actions, history panel (shorter moves, shrinking gaps).
      Decoration (label, divider): fade only. The Back button is static: usable from frame one. */
-  .guild-page.is-entering .gp-header { animation: rise-sm 620ms var(--ease-out) 120ms backwards; }
+  /* The page arrives as one piece (header, panels and backdrop together): no separate entrance for the header */
 
   /* Fallback page transitions (browsers without View Transitions) */
   @keyframes page-fade-in  { from { opacity: 0; } to { opacity: 1; } }
@@ -2213,9 +2213,44 @@ const router = (function() {
   }
   function unnameAll() { clearNames(); }
 
+  // Guild backdrops: download and decode before the page is shown, so the image never pops in mid-transition
+  const bgCache = new Map();
+  function loadBg(id) {
+    if (bgCache.has(id)) return bgCache.get(id);
+    const page = pages.get(id);
+    const m = page && (page.getAttribute('style') || '').match(/--bg:\s*url\(([^)]+)\)/);
+    const entry = { done: !m, promise: Promise.resolve() };
+    if (m) {
+      const img = new Image();
+      entry.promise = new Promise(res => { img.onload = img.onerror = res; img.src = m[1].replace(/['"]/g, ''); })
+        .then(() => img.decode ? img.decode().catch(() => {}) : null)
+        .then(() => { entry.done = true; });
+    }
+    bgCache.set(id, entry);
+    return entry;
+  }
+  // Start the download as soon as a finger or pointer goes down on a guild link
+  document.addEventListener('pointerdown', e => {
+    const link = e.target.closest && e.target.closest('a[href^="#/"]');
+    const id = link && link.getAttribute('href').slice(2);
+    if (id && pages.has(id)) loadBg(id);
+  }, { passive: true, capture: true });
+  let waitingFor = null;
+
   function sync() {
     const next = routeId();
     if (next === current) return;
+    // Opening a guild: wait (at most 700 ms) for its backdrop, then animate
+    if (next && !instantNext) {
+      const bg = loadBg(next);
+      if (!bg.done) {
+        if (waitingFor === next) return;
+        waitingFor = next;
+        Promise.race([bg.promise, new Promise(r => setTimeout(r, 700))]).then(() => { waitingFor = null; sync(); });
+        return;
+      }
+    }
+    waitingFor = null;
     const prev = current;
     current = next;
     const instant = instantNext;
