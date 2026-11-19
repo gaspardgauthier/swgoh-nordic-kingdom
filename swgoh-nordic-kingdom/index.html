@@ -567,17 +567,17 @@
      Lead: the guild name. Support: motto, actions, history panel (shorter moves, shrinking gaps).
      Decoration (label, divider): fade only. The Back button is static: usable from frame one. */
   .guild-page.is-entering .gp-label,
-  .guild-page.is-entering .gp-header > div:not(.gp-actions) { animation: fade-in 360ms var(--ease-out) 80ms backwards; }
-  .guild-page.is-entering .gp-h1    { animation: rise 460ms var(--ease-out) 40ms backwards; }
-  .guild-page.is-entering .gp-devise { animation: rise-sm 380ms var(--ease-out) 130ms backwards; }
-  .guild-page.is-entering .gp-actions { animation: rise-sm 380ms var(--ease-out) 180ms backwards; }
-  .guild-page.is-entering .gp-body  { animation: rise-sm 420ms var(--ease-out) 210ms backwards; }
+  .guild-page.is-entering .gp-header > div:not(.gp-actions) { animation: fade-in 560ms var(--ease-out) 220ms backwards; }
+  .guild-page.is-entering .gp-h1    { animation: rise 700ms var(--ease-out) 160ms backwards; }
+  .guild-page.is-entering .gp-devise { animation: rise-sm 600ms var(--ease-out) 280ms backwards; }
+  .guild-page.is-entering .gp-actions { animation: rise-sm 600ms var(--ease-out) 360ms backwards; }
+  .guild-page.is-entering .gp-body  { animation: rise-sm 680ms var(--ease-out) 420ms backwards; }
 
   /* Fallback page transitions (browsers without View Transitions) */
   @keyframes page-fade-in  { from { opacity: 0; } to { opacity: 1; } }
   @keyframes page-fade-out { from { opacity: 1; } to { opacity: 0; } }
-  .guild-page.fallback-in  { animation: page-fade-in 240ms var(--ease-out) both; }
-  .guild-page.fallback-out { animation: page-fade-out 180ms var(--ease-out) both; }
+  .guild-page.fallback-in  { animation: page-fade-in 420ms var(--ease-out) both; }
+  .guild-page.fallback-out { animation: page-fade-out 300ms var(--ease-out) both; }
 
   .gp-header { text-align: center; margin-bottom: 48px; }
   .gp-label { font-family: 'Orbitron', monospace; font-size: 0.66rem; letter-spacing: 0.4em; color: var(--cyan); text-transform: uppercase; margin-bottom: 10px; }
@@ -709,31 +709,33 @@
      Without a hover preview (touch, keyboard) the world fades up from a slight zoom.
      Leaving is the same path in reverse, faster. */
   ::view-transition-group(home-ui) { z-index: 1; }
-  ::view-transition-group(guild-emblem) { z-index: 2; animation-duration: 440ms; animation-timing-function: var(--ease-in-out); }
-  html[data-nav="forward"]::view-transition-old(home-ui):only-child { animation: vt-recede 280ms var(--ease-out) both; }
+  ::view-transition-group(guild-emblem) { z-index: 2; animation-duration: 760ms; animation-timing-function: var(--ease-in-out); }
+  html[data-nav="back"]::view-transition-group(guild-emblem) { animation-duration: 600ms; }
+  html[data-nav="forward"]::view-transition-old(home-ui):only-child { animation: vt-recede 480ms var(--ease-out) both; }
   ::view-transition-old(guild-emblem),
-  ::view-transition-new(guild-emblem) { animation-duration: 440ms; height: 100%; }
+  ::view-transition-new(guild-emblem) { animation-duration: 760ms; height: 100%; }
 
-  ::view-transition-group(guild-backdrop) { animation-duration: 420ms; animation-timing-function: var(--ease-out); }
+  ::view-transition-group(guild-backdrop) { animation-duration: 640ms; animation-timing-function: var(--ease-out); }
   ::view-transition-old(guild-backdrop),
-  ::view-transition-new(guild-backdrop) { animation-duration: 420ms; animation-timing-function: var(--ease-out); }
-  ::view-transition-new(guild-backdrop):only-child { animation: vt-world-in 380ms var(--ease-out) both; }
-  ::view-transition-old(guild-backdrop):only-child { animation: page-fade-out 240ms var(--ease-out) both; }
+  ::view-transition-new(guild-backdrop) { animation-duration: 640ms; animation-timing-function: var(--ease-out); }
+  ::view-transition-new(guild-backdrop):only-child { animation: vt-world-in 620ms var(--ease-out) both; }
+  ::view-transition-old(guild-backdrop):only-child { animation: page-fade-out 380ms var(--ease-out) both; }
 
   /* The content container does not fade: its own children carry the entrance (one entrance per container) */
   ::view-transition-new(guild-content):only-child { animation: none; }
-  ::view-transition-old(guild-content):only-child { animation: vt-leave 200ms var(--ease-out) both; }
+  ::view-transition-old(guild-content):only-child { animation: vt-leave 320ms var(--ease-out) both; }
 
-  html[data-nav="forward"]::view-transition-old(root) { animation: vt-recede 280ms var(--ease-out) both; }
+  html[data-nav="forward"]::view-transition-old(root) { animation: vt-recede 480ms var(--ease-out) both; }
   html[data-nav="forward"]::view-transition-new(root) { animation: none; }
   /* Back: the home is already fully there underneath; it only settles (scale + blur), so there is no dark dip */
   html[data-nav="back"]::view-transition-old(root)    { animation: none; opacity: 0; }
-  html[data-nav="back"]::view-transition-new(root)    { animation: vt-return 340ms var(--ease-out) both; }
+  html[data-nav="back"]::view-transition-new(root)    { animation: vt-return 520ms var(--ease-out) both; }
 
+  /* Opacity and transform only: full-screen snapshots stay on the compositor (a blur here dropped frames) */
   @keyframes vt-world-in { from { opacity: 0; transform: scale(1.04); } }
-  @keyframes vt-recede   { to { opacity: 0; transform: scale(0.985); filter: blur(4px); } }
-  @keyframes vt-leave    { to { opacity: 0; transform: translateY(8px); filter: blur(3px); } }
-  @keyframes vt-return   { from { transform: scale(0.985); filter: blur(3px); } }
+  @keyframes vt-recede   { to { opacity: 0; transform: scale(0.97); } }
+  @keyframes vt-leave    { to { opacity: 0; transform: translateY(12px); } }
+  @keyframes vt-return   { from { transform: scale(0.97); } }
 
   /* ── RESPONSIVE ── */
   @media (max-width: 600px) {
@@ -1924,7 +1926,7 @@ const router = (function() {
     preview.clear();
     starfield.stop();
     clearTimeout(page._enterTimer);
-    page._enterTimer = setTimeout(() => page.classList.remove('is-entering'), 900);
+    page._enterTimer = setTimeout(() => page.classList.remove('is-entering'), 1400);
   }
 
   function hide(id) {
