@@ -194,8 +194,8 @@
       camera.fov = narrow ? 46 : 34;
       // phones: same tilted view as before, but tighter orbits (same proportions) and bigger worlds,
       // then the whole system is scaled up uniformly until it fills the screen width
-      sizeK = narrow ? 1.35 : 1;
-      orbitK = narrow ? 0.7 : 1;
+      sizeK = narrow ? 1.6 : 1;
+      orbitK = narrow ? 1 : 1;   // phones: full orbits, so worlds keep their distance
       flatK = narrow ? 0.95 : 0.58;   // phones: near-round orbits, so the map grows in both directions
       planets.forEach(p => { if (p.orbitLine) p.orbitLine.scale.set(orbitK, 1, orbitK * flatK / 0.58); });
       if (narrow) { camera.position.set(0, 17, 6.5); camera.lookAt(0, 0, 1.3); }
